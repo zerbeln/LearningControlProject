@@ -57,7 +57,7 @@ class EvoAlg:
                 rnum = random.uniform(0, 1)
                 if rnum < self.mut_chance:
                     weight = self.offspring_pop[policy_id, w]
-                    delta = random.uniform(-self.mut_rate, self.mut_rate)*weight
+                    delta = np.random.normal(0, self.mut_rate)*weight
                     self.offspring_pop[policy_id, w] += (delta*weight)
 
     def epsilon_greedy_select(self):  # Choose K solutions

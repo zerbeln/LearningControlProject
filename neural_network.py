@@ -17,6 +17,8 @@ class NeuralNetwork:
         self.in_layer = np.zeros(self.n_inputs+1)
         self.hid_layer = np.zeros(self.n_nodes)
         self.out_layer = np.zeros(self.n_outputs)
+        self.sm_step = p.small_steps
+        self.bg_step = p.big_steps
 
     def reset_nn(self):  # Clear current network
         """
@@ -100,3 +102,36 @@ class NeuralNetwork:
         """
         sig = 1/(1 + np.exp(-inp))
         return sig
+
+    def downsample_lidar(self, lidar):
+        """
+        Takes in LIDAR and downsamples with the following parameters:
+            For the 90 degrees directly in front and behind (e.g. +/- 45 degrees from dead ahead), downsamples into
+            chunks defined by self.sm_step (defined in parameters file)
+            For the areas to the sides of the robot, it downsamples into chunks defined by self.bg_step (again, defined
+            in parameters file)
+        Then sets the downsampled LIDAR scan as the inputs to the NN with a 1 appended to the end for the bias
+        :param lidar:
+        :return:
+        """
+
+        stop0 = 0
+        stop1 = 45
+        stop2 = 135
+        stop3 = 225
+        stop4 = 315
+        stop5 = 360
+
+        new_scan = []
+        i = 0
+
+        while i < stop5:
+            if stop0 <= i < stop1 or stop2 <= i < stop3 or stop4 <= i < stop5:
+                new_scan.append(np.amin(lidar[i:i + self.sm_step]))
+                i += self.sm_step
+            else:
+                new_scan.append(np.amin(lidar[i:i + self.bg_step]))
+                i += self.bg_step
+
+        new_scan.append(1)  # For bias neuron
+        self.in_layer = np.array(new_scan)

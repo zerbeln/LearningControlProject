@@ -49,7 +49,10 @@ class Agent:
 		    wallDict["right"] = [self.walls[w,1,0], self.walls[w,3,0], self.walls[w,1,1], self.walls[w,3,1]]
 		    wallDict["top"] = [self.walls[w,0,0], self.walls[w,1,0], self.walls[w,0,1], self.walls[w,1,1]]
 		    wallDict["bottom"] = [self.walls[w,2,0], self.walls[w,3,0], self.walls[w,2,1], self.walls[w,3,1]]
-		    wallDict["boundary"] = [0,self.world_x,0,self.world_y]
+		    wallDict["worldLeft"] = [0,0,0,self.world_y]
+		    wallDict["worldRight"] = [self.world_x,self.world_x,0,self.world_y]
+		    wallDict["worldTop"] = [0,self.world_x,self.world_y,self.world_y]
+            	    wallDict["worldBottom"] = [0,self.world_x,0,0]
 		    x1 = self.agent_pos(0)
 		    y1 = self.agent_pos(1)
 

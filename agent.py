@@ -38,11 +38,11 @@ class Agent:
         nn_input_vec = np.zeros(self.n_inputs)
         # Conduct scan
         for deg in range(self.sensor_res):
-            dI = deg*(np.pi/180) #convert to degrees
-		    xNew = -np.sin(dI)*self.sensor_radius + self.agent_pos(0) #ccw X
-		    yNew = np.cos(dI)*self.sensor_radius + self.agent_pos(1) #ccw Y
-
-
+	    dI = deg*(np.pi/180) #convert to degrees
+	    xNew = -np.sin(dI)*self.sensor_radius + self.agent_pos(0) #ccw X
+	    yNew = np.cos(dI)*self.sensor_radius + self.agent_pos(1) #ccw Y
+	
+	
             for w in range(self.num_walls):
                 #build a dictionary of the wall lines for each wall
                 wallDict["left"] = [self.walls[w,0,0], self.walls[w,2,0], self.walls[w,0,1], self.walls[w,2,1]]
@@ -59,23 +59,22 @@ class Agent:
                     x4 = wallDict[key][1]
                     y3 = wallDict[key][0]
                     y4 = wallDict[key][1]
-                    #intersectionA
+                    #direction vector A
                     uAP1 = (x4-x3)*(x1-y3) - (y4-y3)*(x1-x3)
                     uAP2 = (y4-y3)*(xNew-x1) - (x4-x3)*(yNew-y1)
                     uA = np.divide(uAP1,uAP2)
-                    #intersectionB
+                    #direction vector B
                     uBP1 = (xNew-x1)*(y1-y3) - (yNew-y1)*(x1-x3)
                     uBP2 = (y4-y3)*(xNew-x1) - (x4-x3)*(yNew-y1)
                     uB = np.divide(uBP1,uBP2)
 
                     if((uA >= 0 and uA <= 1) and (uB >= 0 and uB <= 1)):
-                        #found an intersection, get the distance
+                        #found an intersection, get the coordinates and distance from agent
                         xIntersect = x1 + (uA*(xNew-x1))
-					    yIntersect = y1 + (uA*(yNew-y1))
-
+			yIntersect = y1 + (uA*(yNew-y1))
+			
                         r = np.sqrt((xIntersect-x1) ** 2 + (yIntersect-y1)**2)
                         self.lidar_sensors[deg] = r
-                        print(xIntersect,yIntersect,r)
                     else:
                         #no intersection, set r to inf
                         self.lidar_sensors[deg] = math.inf

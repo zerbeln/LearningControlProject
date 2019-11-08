@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import numpy as np
 
 class World:
@@ -18,7 +20,7 @@ class World:
         Simple world with two walls and one door in the middle of the map
         :return:
         """
-        assert(self.num_walls == 1)
+        #assert(self.num_walls == 1)
 
         # Wall 1
         # Top Left Corner

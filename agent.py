@@ -24,7 +24,7 @@ class Agent:
         Gives the agent a new starting position in the world (Complete world reset)
         :return:
         """
-        self.agent_start_pos = [1,1,0]
+        self.agent_start_pos = [1.0,1.0,0.0]
         self.agent_pos = self.agent_start_pos
 
     def reset_agent_to_start(self):
@@ -40,56 +40,56 @@ class Agent:
         :return: vector of lidar scan with input size
         """
         wallDict = {}#init wall/boundary dictionary
-        nn_input_vec = np.zeros(self.n_inputs)
+        #build boundary segments
+        #format [X3,X4,Y3,Y4]
+        wallDict["worldLeft"] = [0,0,0,world_y]
+        wallDict["worldRight"] = [world_x,world_x,0,world_y]
+        wallDict["worldTop"] = [0,world_x,world_y,world_y]
+        wallDict["worldBottom"] = [0,world_x,0,0]
+
         x1 = self.agent_pos[0]
         y1 = self.agent_pos[1]
 
         # Conduct scan
-        for deg in range(360):
+        for deg in range(self.sensor_res):
             dI = deg*(np.pi/180) #convert to degree
             xNew = -np.sin(dI)*self.sensor_radius + x1 #ccw X
             yNew = np.cos(dI)*self.sensor_radius + y1 #ccw Y
-
+            
 
             for w in range(walls.shape[0]):
-                #build a dictionary of the wall lines
+                #build wall segments
+                #format [X3,X4,Y3,Y4]
                 wallDict["left"] = [walls[w,0,0], walls[w,2,0], walls[w,0,1], walls[w,2,1]]
                 wallDict["right"] = [walls[w,1,0], walls[w,3,0], walls[w,1,1], walls[w,3,1]]
                 wallDict["top"] = [walls[w,0,0], walls[w,1,0], walls[w,0,1], walls[w,1,1]]
                 wallDict["bottom"] = [walls[w,2,0], walls[w,3,0], walls[w,2,1], walls[w,3,1]]
-                wallDict["worldLeft"] = [0,0,0,world_y]
-                wallDict["worldRight"] = [world_x,world_x,0,world_y]
-                wallDict["worldTop"] = [0,world_x,world_y,world_y]
-                wallDict["worldBottom"] = [0,world_x,0,0]
-
+                
                 for key in wallDict:
                     #loop through each part of the rectangle and check if it intersects
-                    x3 = wallDict[key][0]
-                    x4 = wallDict[key][1]
-                    y3 = wallDict[key][2]
-                    y4 = wallDict[key][3]
+                    x3 = wallDict[key][0]+np.random.uniform(low = 0,high=0.1)
+                    x4 = wallDict[key][1]+np.random.uniform(low = 0,high=0.1)
+                    y3 = wallDict[key][2]+np.random.uniform(low = 0,high=0.1)
+                    y4 = wallDict[key][3]+np.random.uniform(low = 0,high=0.1)
                     #direction vector A
                     uAP1 = (x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)
                     uAP2 = (y4-y3)*(xNew-x1) - (x4-x3)*(yNew-y1)
-                    uA = np.divide(uAP1,uAP2)
+                    uA = np.true_divide(uAP1,uAP2)
                     #direction vector B
                     uBP1 = (xNew-x1)*(y1-y3) - (yNew-y1)*(x1-x3)
                     uBP2 = (y4-y3)*(xNew-x1) - (x4-x3)*(yNew-y1)
-                    uB = np.divide(uBP1,uBP2)
+                    uB = np.true_divide(uBP1,uBP2)
 
                     if((uA >= 0 and uA <= 1) and (uB >= 0 and uB <= 1)):
                         #found an intersection, get the distance
                         xIntersect = x1 + (uA*(xNew-x1))
                         yIntersect = y1 + (uA*(yNew-y1))
-
                         r = np.sqrt((xIntersect-x1) ** 2 + (yIntersect-y1)**2)
                         self.lidar_sensors[deg] = r
-                    else:
-                        #no intersection, set r to inf
-                        self.lidar_sensors[deg] = np.inf
-
-        nn_input_vec = self.lidar_sensors
-        return nn_input_vec
+                    #leave alone if not intersect and set to inf after checking all lines
+            if(self.lidar_sensors[deg] == 0):
+                self.lidar_sensors[deg] = np.inf
+        return self.lidar_sensors
 
     def agent_step(self, nn_outputs, time_step):
         """

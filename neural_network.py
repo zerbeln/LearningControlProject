@@ -42,6 +42,21 @@ class NeuralNetwork:
             weight = np.random.normal(0, 1)
             self.weights2[w] = weight
 
+    def get_nn_weights(self, weight_vec):
+        """
+        Get weights from the EA for testing
+        :param weight_vec:
+        :return:
+        """
+
+        weight_count = 0
+        for w in range(self.n_weights):
+            if w < self.n_hidden_weights:
+                self.weights1[w] = weight_vec[w]
+            else:
+                self.weights2[weight_count] = weight_vec[w]
+                weight_count += 1
+
     def get_inputs(self, input_vec):  # Get inputs from state-vector
         """
         Fill in input layer of neural network with sensor inputs from robot

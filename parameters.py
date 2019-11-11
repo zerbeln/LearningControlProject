@@ -4,7 +4,7 @@ class Parameters:
 
     # Test Parameters
     stat_runs = 1  # Number of statistical runs to perform
-    generations = 100  # Number of generations for training NN
+    generations = 10  # Number of generations for training NN
     time_step = 0.1
 
     # Agent Parameters

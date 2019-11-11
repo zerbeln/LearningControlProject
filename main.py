@@ -14,17 +14,20 @@ def main():
     ag = Agent(p)
     ag.set_agent_start_pos()
     wld.world_config1()
+    reward = 0
 
     #go lidar go. initial sweep
-    sweep = ag.lidar_scan(wld.world_x,wld.world_y,wld.walls)
+    ea.reset_populations()
     #order of operations
-    #sweep, downsize, pass to neural net, receive movement, move
+    #sweep, downsize, pass to neural net, receive movement, move, update reward/collision
     #repeat until steps are done
-    downLIDAR = nn.downsample_lidar(sweep)
-    print(downLIDAR)
-    # nn.get_inputs(downLIDAR)
-    # nn.get_outputs()
-    # print(output)
-    # ag.agent_step(nn_outputs, time_step)
+    #ten seconds of movement
+    for step in range(100):
+        sweep = ag.lidar_scan(wld.world_x,wld.world_y,wld.walls)
+        nn.downsample_lidar(sweep)
+        nn.get_outputs()
+        ag.agent_step(nn.out_layer,p.time_step)
+        reward += wld.calculate_reward(ag.agent_pos)
+        print(ag.agent_pos, reward)
 
 main()

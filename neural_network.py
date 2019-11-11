@@ -80,12 +80,12 @@ class NeuralNetwork:
 
 
         for n in range(self.n_nodes):  # Pass hidden layer nodes through activation function
-            self.hid_layer[n] = self.sigmoid(self.hid_layer[n])
+            self.hid_layer[n] = self.tanh(self.hid_layer[n])
 
         self.out_layer = np.dot(self.hid_layer, ho_weights)
 
         for n in range(self.n_outputs):  # Pass output nodes through activation function
-            self.out_layer[n] = self.sigmoid(self.out_layer[n])
+            self.out_layer[n] = self.tanh(self.out_layer[n])
 
 
     def tanh(self, inp):  # Tanh function as activation function
@@ -138,5 +138,3 @@ class NeuralNetwork:
 
         new_scan.append(1)  # For bias neuron
         self.in_layer = np.array(new_scan)
-        #return back array for now cuz I need to follow wtf is going on
-        return new_scan

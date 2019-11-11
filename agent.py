@@ -87,8 +87,8 @@ class Agent:
                         r = np.sqrt((xIntersect-x1) ** 2 + (yIntersect-y1)**2)
                         self.lidar_sensors[deg] = r
                     #leave alone if not intersect and set to inf after checking all lines
-            if(self.lidar_sensors[deg] == 0):
-                self.lidar_sensors[deg] = np.inf
+            # if(self.lidar_sensors[deg] == 0):
+            #     self.lidar_sensors[deg] = np.inf
         return self.lidar_sensors
 
     def agent_step(self, nn_outputs, time_step):

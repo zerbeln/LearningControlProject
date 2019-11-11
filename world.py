@@ -85,11 +85,13 @@ class World:
 
         return collision_detected
 
-    def calculate_reward(self, agent_pos, agent_rad):
+
+    def calculate_reward(self, agent_pos):
         """
         Calculates reward received by agent at each time step
         :return:
         """
+        agent_rad = agent_pos[2] #x,y,theta
 
         goal = False
 

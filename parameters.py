@@ -5,6 +5,7 @@ class Parameters:
     # Test Parameters
     stat_runs = 1  # Number of statistical runs to perform
     generations = 100  # Number of generations for training NN
+    time_step = 0.1
 
     # Agent Parameters
     # Turtlebot3 Burger
@@ -33,8 +34,8 @@ class Parameters:
     parent_pop_size = 10
 
     # Neural Network Parameters
-    num_inputs = 2  # Number of input nodes in the input layer
-    num_hidden = 8  # Number of nodes in the hidden layer
+    num_inputs = 48  # Number of input nodes in the input layer
+    num_hidden = 1  # Number of nodes in the hidden layer
     num_outputs = 2  # Number of output nodes in the output layer
 
     # LIDAR parameters

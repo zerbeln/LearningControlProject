@@ -102,7 +102,6 @@ class NeuralNetwork:
         for n in range(self.n_outputs):  # Pass output nodes through activation function
             self.out_layer[n] = self.tanh(self.out_layer[n])
 
-
     def tanh(self, inp):  # Tanh function as activation function
         """
         NN activation function

@@ -73,35 +73,35 @@ class World:
         self.door[3, 0] = (self.world_x/2) + self.wall_thickness
         self.door[3, 1] = (self.world_y/2) - (self.door_length/2.0)
 
-    def detect_collision(self, agent_pos, agent_rad):
-        """
-        Checks the agent position to see if a collision has occurred
-        :param agent_pos:
-        :param agent_rad:
-        :return:
-        """
+    # def detect_collision(self, agent_pos, agent_rad):
+    #     """
+    #     Checks the agent position to see if a collision has occurred
+    #     :param agent_pos:
+    #     :param agent_rad:
+    #     :return:
+    #     """
 
-        collision_detected = False
+    #     collision_detected = False
 
-        return collision_detected
+    #     return collision_detected
 
 
-    def calculate_reward(self, agent_pos):
-        """
-        Calculates reward received by agent at each time step
-        :return:
-        """
-        agent_rad = agent_pos[2] #x,y,theta
+    # def calculate_reward(self, agent_pos):
+    #     """
+    #     Calculates reward received by agent at each time step
+    #     :return:
+    #     """
+    #     agent_rad = agent_pos[2] #x,y,theta
 
-        goal = False
+    #     goal = False
 
-        collision = self.detect_collision(agent_pos, agent_rad)
+    #     collision = self.detect_collision(agent_pos, agent_rad)
 
-        if collision:
-            reward = self.collision_penalty
-        elif goal:
-            reward = 100.0
-        else:
-            reward = self.step_penalty
+    #     if collision:
+    #         reward = self.collision_penalty
+    #     elif goal:
+    #         reward = 100.0
+    #     else:
+    #         reward = self.step_penalty
 
-        return reward
+    #     return reward

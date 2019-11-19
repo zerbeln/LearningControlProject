@@ -8,7 +8,6 @@ from world import World
 
 def main():
     #initialize
-    goal = False
     nn = neu_net.NeuralNetwork(p)
     ea = ev_alg.EvoAlg(p)
     wld = World(p)
@@ -27,21 +26,32 @@ def main():
         ag.reset_agent_to_start()
         nn.get_nn_weights(ea.pops[i])
         reward = 0
+        goal = False
+        collision = False
         for step in range(100):
             #goal = ag.goal_reached(wld.door)#what do we want to do when we have passed the threshold
             sweep = ag.lidar_scan(wld.world_x, wld.world_y, wld.walls)
             nn.downsample_lidar(sweep)
             nn.get_outputs()
             ag.agent_step(nn.out_layer, p.time_step, p.max_vel,p.max_rot_vel)
-            goal = ag.goal_reached(wld.door)
+            #stop if there is a collision
             collision = ag.collision_detection()
+            if collision:
+                reward += ag.calculate_reward(goal,collision)
+                break
+            #stop if we reached the goal and did not collide with something
+            goal = ag.goal_reached(wld.door)
+            if goal:
+                reward += ag.calculate_reward(goal,collision)
+                break
+            #calculate reward
             reward += ag.calculate_reward(goal,collision)
+        print(ag.agent_pos,reward)
         ea.fitness[i] = reward
-        print(ag.agent_pos, reward)
     ea.epsilon_greedy_select()
     ea.offspring_pop = ea.parent_pop.copy()  # Produce K offspring
     ea.mutate()  # Mutate offspring population
-    Train population
+    #Train population
     for gen in range(p.generations):
         for i in range(p.offspring_pop_size):
             ag.reset_agent_to_start()
@@ -59,6 +69,5 @@ def main():
                 # print(ag.agent_pos, reward)
             ea.offspring_fitness[i] = reward
             print(ag.agent_pos,reward)
-
-       ea.down_select()
+    ea.down_select()
 main()

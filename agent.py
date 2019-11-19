@@ -41,6 +41,8 @@ class Agent:
         This function is called when the agent needs to gather LIDAR inputs for the NN
         :return: vector of lidar scan with input size
         """
+        #reset lidar each scan
+        self.lidar_sensors = np.zeros(self.sensor_res)
         wallDict = {}#init wall/boundary dictionary
         #build boundary segments
         #format [X3,X4,Y3,Y4]
@@ -55,8 +57,26 @@ class Agent:
         # Conduct scan
         for deg in range(self.sensor_res):
             dI = deg*(np.pi/180) #convert to degree
-            xNew = -np.sin(dI)*self.sensor_radius + x1 #ccw X
-            yNew = np.cos(dI)*self.sensor_radius + y1 #ccw Y
+
+            #first 90 degrees
+            if deg <= 90:
+                xNew = -np.sin(dI)*self.sensor_radius + x1 #ccw X
+                yNew = np.cos(dI)*self.sensor_radius + y1 #ccw Y
+
+            #90-180
+            if deg > 90 and deg <= 180:
+                xNew = -np.cos(dI-90)*self.sensor_radius + x1 #ccw X
+                yNew = -np.sin(dI-90)*self.sensor_radius + y1 #ccw Y                
+
+            #180-270
+            if deg > 180 and deg <= 270:
+                xNew = np.sin(dI-180)*self.sensor_radius + x1 #ccw X
+                yNew = -np.cos(dI-180)*self.sensor_radius + y1 #ccw Y
+
+            #270-360
+            if deg > 270 and deg <= 360:
+                xNew = np.cos(dI-270)*self.sensor_radius + x1 #ccw X
+                yNew = np.sin(dI-270)*self.sensor_radius + y1 #ccw Y    
             
 
             for w in range(walls.shape[0]):
@@ -127,11 +147,12 @@ class Agent:
         This function is called every time step to detect if the agent has run into anything
         :return: True for collision, false for no collision
         """
+        collision = False
 
         if np.amin(self.lidar_sensors) < self.body_radius + self.buffer:
-            return True
+            collision = True
 
-        return False
+        return collision
 
     def calculate_reward(self, goal,collision):
         """
@@ -167,7 +188,7 @@ class Agent:
         #need to determine which side of door we started on
         if self.agent_start_pos[0] < door[0,0]:
             #door is to the right
-            if self.agent_pos[0] > door[0,0]:
+            if self.agent_pos[0] > door[2,0]:
                 goal = True
 
         elif self.agent_start_pos[0] > door[0,0]:

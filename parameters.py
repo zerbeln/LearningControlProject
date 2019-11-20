@@ -23,6 +23,7 @@ class Parameters:
     w_thick = 2.0  # Thickness of the walls in the world
     coll_penalty = -10.0
     stp_penalty = -1.0
+    gl_reward = 100.0
     n_walls = 2  # Number of internal walls in the world
     d_length = 4.0  # Length of the door in the world
 

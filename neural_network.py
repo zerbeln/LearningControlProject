@@ -78,13 +78,14 @@ class NeuralNetwork:
         self.hid_layer = np.zeros(self.n_nodes)
         self.out_layer = np.zeros(self.n_outputs)
 
-    def get_outputs(self):
+    def get_outputs(self, sweep):
         """
         Run NN to receive rover action outputs
-        :param rov_id:
+        :param sweep:
         :return: None
         """
         self.reset_layers()
+        self.downsample_lidar(sweep)
 
         # Reshape weight arrays into a matrix for matrix multiplication
         ih_weights = np.reshape(self.weights1, [self.n_inputs + 1, self.n_nodes])

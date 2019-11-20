@@ -113,7 +113,7 @@ class Agent:
                 self.lidar_sensors[deg] = 3.5
         return self.lidar_sensors
 
-    def agent_step(self, nn_outputs, time_step):
+    def agent_step(self, nn_outputs, time_step, walls, world_x, world_y):
         """
         What about negative velocity and theta
         Agent executes movement based on control signals from NN
@@ -141,67 +141,33 @@ class Agent:
         x_new = self.agent_pos[0] + d_vel * time_step * cos(self.agent_pos[2])
         y_new = self.agent_pos[1] + d_vel * time_step * sin(self.agent_pos[2])
         theta_new = self.agent_pos[2] + d_theta * time_step
-        # theta_new = theta_new / max_rot_vel
 
-        illegal = False
-        # TODO: boundary checking -- if the new positions are illegal, reject and set collision = true
+        # Boundary checking -- if the new positions are illegal, reject and set collision = true
         # Keep the previous coordinates
-
+        illegal = self.collision_detection(x_new, y_new, walls, world_x, world_y)
         if not illegal:
             self.agent_pos = [x_new, y_new, theta_new]
 
-    def collision_detection(self):
+        return illegal
+
+    def collision_detection(self, x_new, y_new, walls, world_x, world_y):
         """
         This function is called every time step to detect if the agent has run into anything
+        Calculates in C-space
         :return: True for collision, false for no collision
         """
         collision = False
+        dist = self.body_radius + self.buffer  # Acceptable distance to wall
 
-        if np.amin(self.lidar_sensors) < self.body_radius + self.buffer:
+        if x_new <= 0 + dist or x_new >= world_x - dist:  # Checks outer wall
+            collision = True
+        elif y_new <= 0 + dist or y_new >= world_y - dist:  # Checks outer wall
+            collision = True
+        elif walls[0, 0, 0] - dist <= x_new <= walls[0, 3, 0] + dist and \
+                walls[0, 3, 1] - dist <= y_new <= walls[0, 0, 1] + dist:  # Checks wall 0
+            collision = True
+        elif walls[1, 0, 0] - dist <= x_new <= walls[1, 3, 0] + dist and \
+                walls[1, 3, 1] - dist <= y_new <= walls[1, 0, 1] + dist:  # Checks wall 1
             collision = True
 
         return collision
-
-    def calculate_reward(self, goal, collision):
-        """
-        Calculates reward received by agent at each time step
-        :return:
-        """
-        # agent_rad = agent_pos[2] #x,y,theta
-
-        # goal = False
-
-        # collision = self.detect_collision(agent_pos, agent_rad)
-        # goal = self.goal_reached()
-
-        if collision:
-            reward = self.collision_penalty
-        elif goal:
-            reward = 100.0
-        else:
-            reward = self.step_penalty
-
-        return reward
-
-    def goal_reached(self, door):
-        """
-        Checks if the agent has passed through opposite of where it started
-        :param door:
-        :param agent_pos: agent location
-        :param agent_rad: agent orientation
-        """
-        goal = False
-
-
-        #need to determine which side of door we started on
-        if self.agent_start_pos[0] < door[0,0]:
-            #door is to the right
-            if self.agent_pos[0] > door[2,0]:
-                goal = True
-
-        elif self.agent_start_pos[0] > door[0,0]:
-            #door is to the left
-            if self.agent_pos[0] < door[0,0]:
-                goal = True
-
-        return goal

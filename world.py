@@ -14,7 +14,7 @@ class World:
         self.walls = np.zeros((self.num_walls, 4, 2))
         self.collision_penalty = p.coll_penalty
         self.step_penalty = p.stp_penalty
-        self.goal_reward = p.gl.reward
+        self.goal_reward = p.gl_reward
         self.agent_starting_room = 1  # Agent starts in room 1 or room 2
 
     def world_config1(self):
@@ -86,26 +86,26 @@ class World:
         :return:
         """
         reward = 0
-        goal = True
+        goal = False
 
         if collision:
             return self.collision_penalty, False
 
         if self.agent_starting_room == 1:  # Agent starts in room 1 and crosses to room 2
             if self.threshold[0, 0] == self.threshold[1, 0]:  # Crosses in X-Direction
-                if agent_pos[0] + agent_rad < self.threshold[0, 0] or agent_pos[0] - agent_rad < self.threshold[0, 0]:
-                    goal = False
+                if agent_pos[0] + agent_rad > self.threshold[0, 0] and agent_pos[0] - agent_rad > self.threshold[0, 0]:
+                    goal = True
             else:  # Crosses in Y-Direction
-                if agent_pos[1] + agent_rad < self.threshold[0, 1] or agent_pos[1] - agent_rad < self.threshold[0, 1]:
-                    goal = False
+                if agent_pos[1] + agent_rad < self.threshold[0, 1] and agent_pos[1] - agent_rad < self.threshold[0, 1]:
+                    goal = True
 
         elif self.agent_starting_room == 2:  # Agent starts in room 2 and crosses to room 1
             if self.threshold[0, 0, 0] == self.threshold[0, 1, 0]:  # Crosses in X-Direction
-                if agent_pos[0] + agent_rad > self.threshold[0, 0] or agent_pos[0] - agent_rad > self.threshold[0, 0]:
-                    goal = False
+                if agent_pos[0] + agent_rad < self.threshold[0, 0] and agent_pos[0] - agent_rad < self.threshold[0, 0]:
+                    goal = True
             else:  # Crosses in Y-Direction
-                if agent_pos[1] + agent_rad > self.threshold[0, 1] or agent_pos[1] - agent_rad > self.threshold[0, 1]:
-                    goal = False
+                if agent_pos[1] + agent_rad > self.threshold[0, 1] and agent_pos[1] - agent_rad > self.threshold[0, 1]:
+                    goal = True
 
         if goal:
             return self.goal_reward, goal

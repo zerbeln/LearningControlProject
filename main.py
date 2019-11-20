@@ -17,7 +17,7 @@ def try_it_out(nn, wld, ag):
         collision = ag.agent_step(nn.out_layer, p.time_step, wld.walls, wld.world_x, wld.world_y)
 
         # calculate reward
-        step_reward, goal = ag.calculate_reward(ag.agent_pos, ag.body_radius, collision)
+        step_reward, goal = wld.calculate_reward(ag.agent_pos, ag.body_radius, collision)
         reward += step_reward
 
         # Stop if we reached the goal
@@ -35,6 +35,8 @@ def main():
     ag = Agent(p)
     ag.set_agent_start_pos()
     wld.world_config1()
+    wld.set_agent_starting_room(ag.agent_pos)
+    print("Starting Room is: ", wld.agent_starting_room)
     ea.reset_populations()
 
     # order of operations
@@ -54,13 +56,13 @@ def main():
     ea.mutate()  # Mutate offspring population
 
     # Train population
-    for gen in range(p.generations):
-        for i in range(p.offspring_pop_size):
-            nn.get_nn_weights(ea.pops[i])
-            reward = try_it_out(nn, wld, ag)
-            ea.offspring_fitness[i] = reward
-            print(ag.agent_pos, reward)
-    ea.down_select()
+    # for gen in range(p.generations):
+    #     for i in range(p.offspring_pop_size):
+    #         nn.get_nn_weights(ea.pops[i])
+    #         reward = try_it_out(nn, wld, ag)
+    #         ea.offspring_fitness[i] = reward
+    #         print(ag.agent_pos, reward)
+    # ea.down_select()
 
 
 main()

@@ -27,7 +27,7 @@ class Agent:
         Gives the agent a new starting position in the world (Complete world reset)
         :return:
         """
-        self.agent_start_pos = [10.0,10.0,0.0]
+        self.agent_start_pos = [3.0, 5.0, 0.0]
         self.agent_pos = self.agent_start_pos
 
     def reset_agent_to_start(self):
@@ -57,7 +57,7 @@ class Agent:
 
         # Conduct scan
         for deg in range(self.sensor_res):
-            dI = deg*(np.pi/180) # convert to degree
+            dI = deg*(np.pi/180)  # convert to radians
 
             # first 90 degrees
             if deg <= 90:
@@ -66,18 +66,18 @@ class Agent:
 
             # 90-180
             if 90 < deg <= 180:
-                xNew = -np.cos(dI-90)*self.sensor_radius + x1  # ccw X
-                yNew = -np.sin(dI-90)*self.sensor_radius + y1  # ccw Y
+                xNew = -np.cos(dI-0.5*np.pi)*self.sensor_radius + x1  # ccw X
+                yNew = -np.sin(dI-0.5*np.pi)*self.sensor_radius + y1  # ccw Y
 
             # 180-270
             if 180 < deg <= 270:
-                xNew = np.sin(dI-180)*self.sensor_radius + x1  # ccw X
-                yNew = -np.cos(dI-180)*self.sensor_radius + y1  # ccw Y
+                xNew = np.sin(dI-np.pi)*self.sensor_radius + x1  # ccw X
+                yNew = -np.cos(dI-np.pi)*self.sensor_radius + y1  # ccw Y
 
             # 270-360
             if 270 < deg <= 360:
-                xNew = np.cos(dI-270)*self.sensor_radius + x1  # ccw X
-                yNew = np.sin(dI-270)*self.sensor_radius + y1  # ccw Y
+                xNew = np.cos(dI-(3.0/2.0)*np.pi)*self.sensor_radius + x1  # ccw X
+                yNew = np.sin(dI-(3.0/2.0)*np.pi)*self.sensor_radius + y1  # ccw Y
 
             for w in range(walls.shape[0]):
                 # build wall segments
@@ -124,29 +124,34 @@ class Agent:
         :return:
         """
 
-        [d_vel, d_theta] = nn_outputs  # Change in velocity and theta, respectively
+        [d_vel, omega] = nn_outputs  # Change in velocity and theta, respectively
         # scale output in terms of maximum values
-        d_vel = d_vel * self.max_vel
-        d_theta = d_theta * self.max_rot_vel
+        d_vel *= self.max_vel
+        omega *= self.max_rot_vel
 
         if d_vel > self.max_vel:
             d_vel = self.max_vel
             print("something has gone terribly wrong")
 
-        if d_theta > self.max_rot_vel:
-            d_theta = self.max_rot_vel
+        if omega > self.max_rot_vel:
+            omega = self.max_rot_vel
             print("something has gone horribly wrong")
 
         # This seems too simple? Like... it has to be more complicated than this... right?
         x_new = self.agent_pos[0] + d_vel * time_step * cos(self.agent_pos[2])
         y_new = self.agent_pos[1] + d_vel * time_step * sin(self.agent_pos[2])
-        theta_new = self.agent_pos[2] + d_theta * time_step
+        theta_new = self.agent_pos[2] + omega * time_step
+        if theta_new < 0:
+            theta_new += 2*np.pi
+        if theta_new > 2*np.pi:
+            theta_new -= 2*np.pi
 
         # Boundary checking -- if the new positions are illegal, reject and set collision = true
         # Keep the previous coordinates
         illegal = self.collision_detection(x_new, y_new, walls, world_x, world_y)
         if not illegal:
             self.agent_pos = [x_new, y_new, theta_new]
+            # print(self.agent_pos)
 
         return illegal
 
@@ -163,11 +168,12 @@ class Agent:
             collision = True
         elif y_new <= 0 + dist or y_new >= world_y - dist:  # Checks outer wall
             collision = True
-        elif walls[0, 0, 0] - dist <= x_new <= walls[0, 3, 0] + dist and \
-                walls[0, 3, 1] - dist <= y_new <= walls[0, 0, 1] + dist:  # Checks wall 0
+        elif walls[0, 0, 0] - dist <= x_new <= walls[0, 3, 0] + dist and walls[0, 3, 1] - dist <= y_new <= walls[0, 0, 1] + dist:  # Checks wall 0
             collision = True
-        elif walls[1, 0, 0] - dist <= x_new <= walls[1, 3, 0] + dist and \
-                walls[1, 3, 1] - dist <= y_new <= walls[1, 0, 1] + dist:  # Checks wall 1
+        elif walls[1, 0, 0] - dist <= x_new <= walls[1, 3, 0] + dist and walls[1, 3, 1] - dist <= y_new <= walls[1, 0, 1] + dist:  # Checks wall 1
             collision = True
+
+        # if collision:
+        #     print("COLLISION DETECTED")
 
         return collision

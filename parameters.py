@@ -4,8 +4,9 @@ class Parameters:
 
     # Test Parameters
     stat_runs = 1  # Number of statistical runs to perform
-    generations = 1  # Number of generations for training NN
-    time_step = 1.0
+    generations = 1000  # Number of generations for training NN
+    time_step = 0.5  # Amount of time (seconds) agent moves each step
+    agent_steps = 1000  # Number of steps agent is allowed to move
 
     # Agent Parameters
     # Turtlebot3 Burger
@@ -28,14 +29,14 @@ class Parameters:
 
     # EA Parameters
     epsilon = 0.1  # For e-greedy selection
-    prob_mutation = 0.2  # The probability that a given weight will mutate
+    prob_mutation = 0.1  # The probability that a given weight will mutate
     mutation_rate = 0.05  # The maximum rate of change allowed from the mutation
-    offspring_pop_size = 10
-    parent_pop_size = 10
+    offspring_pop_size = 1
+    parent_pop_size = 1
 
     # Neural Network Parameters
     num_inputs = 48  # Number of input nodes in the input layer
-    num_hidden = 1  # Number of nodes in the hidden layer
+    num_hidden = 20  # Number of nodes in the hidden layer
     num_outputs = 2  # Number of output nodes in the output layer
 
     # LIDAR parameters

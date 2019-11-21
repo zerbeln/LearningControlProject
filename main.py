@@ -5,13 +5,15 @@ import evolutionary_algorithm as ev_alg
 from parameters import Parameters as p
 from agent import Agent
 from world import World
-
+import numpy as np
+import os
+import csv
 
 def try_it_out(nn, wld, ag):
     ag.reset_agent_to_start()
     reward = 0
 
-    for step in range(100):
+    for step in range(p.agent_steps):
         sweep = ag.lidar_scan(wld.world_x, wld.world_y, wld.walls)
         nn.get_outputs(sweep)
         collision = ag.agent_step(nn.out_layer, p.time_step, wld.walls, wld.world_x, wld.world_y)
@@ -25,6 +27,17 @@ def try_it_out(nn, wld, ag):
             break
 
     return reward
+
+def create_output_files(filename, in_vec):
+    dir_name = 'Output_Data/'
+
+    if not os.path.exists(dir_name):  # If directory does not exist, create it
+        os.makedirs(dir_name)
+
+    save_file_name = os.path.join(dir_name, filename)
+    with open(save_file_name, 'a+', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(in_vec)
 
 
 def main():
@@ -44,25 +57,45 @@ def main():
     # repeat until steps are done
     # ten seconds of movement
 
+    best_fit = [0 for _ in range(p.generations+1)]
+
     # Test initial population
     for i in range(ea.total_pop_size):
         nn.get_nn_weights(ea.pops[i])
         reward = try_it_out(nn, wld, ag)
-        print(ag.agent_pos, reward)
+        # print(ag.agent_pos, reward)
         ea.fitness[i] = reward
 
+    best_fit[0] = max(ea.fitness)  # Records best initial fitness
     ea.epsilon_greedy_select()
     ea.offspring_pop = ea.parent_pop.copy()  # Produce K offspring
     ea.mutate()  # Mutate offspring population
 
+
     # Train population
-    # for gen in range(p.generations):
-    #     for i in range(p.offspring_pop_size):
-    #         nn.get_nn_weights(ea.pops[i])
-    #         reward = try_it_out(nn, wld, ag)
-    #         ea.offspring_fitness[i] = reward
-    #         print(ag.agent_pos, reward)
-    # ea.down_select()
+    for gen in range(p.generations):
+        print("Generation: ", gen)
+        for i in range(p.offspring_pop_size):
+            nn.get_nn_weights(ea.pops[i])
+            reward = try_it_out(nn, wld, ag)
+            ea.offspring_fitness[i] = reward
+            # print(ag.agent_pos, reward)
+        if gen < p.generations-1:  # Do not do down-select at the end of the final generation
+            ea.down_select()
+        if gen == p.generations-1:
+            ea.combine_pops()
+        best_fit[gen+1] = max(ea.fitness)  # Record best fitness after each gen
+
+    create_output_files("BestFit.csv", best_fit)
+    best_nn = np.argmax(ea.fitness)
+    nn.get_nn_weights(ea.pops[best_nn])
+    reward = try_it_out(nn, wld, ag)
+    print(reward)
+
+    record_best_nn = [0.0 for _ in range(ea.policy_size)]
+    for w in range(ea.policy_size):  # Need to convert to non np-array for csv writer
+        record_best_nn[w] = ea.pops[best_nn, w]
+    create_output_files("BestNN.csv", record_best_nn)
 
 
 main()

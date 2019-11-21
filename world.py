@@ -9,9 +9,8 @@ class World:
         self.world_y = p.y_dim
         self.door_length = p.d_length
         self.threshold = np.zeros((2, 2))
-        self.wall_thickness = p.w_thick
         self.num_walls = p.n_walls
-        self.walls = np.zeros((self.num_walls, 4, 2))
+        self.walls = np.zeros((self.num_walls, 2, 2))
         self.collision_penalty = p.coll_penalty
         self.step_penalty = p.stp_penalty
         self.goal_reward = p.gl_reward
@@ -22,41 +21,24 @@ class World:
         Simple world with two walls and one door in the middle of the map
         :return:
         """
-        #assert(self.num_walls == 1)
 
-        # Wall 1
-        # Top Left Corner
+        # Wall 1 (Top of the world)
+        # Top Corner
         self.walls[0, 0, 0] = (self.world_x/2)
         self.walls[0, 0, 1] = self.world_y
 
-        # Top Right Corner
-        self.walls[0, 1, 0] = self.walls[0, 0, 0] + self.wall_thickness
-        self.walls[0, 1, 1] = self.world_y
+        # Bottom Corner (Corner protruding into world)
+        self.walls[0, 1, 0] = (self.world_x / 2.0)
+        self.walls[0, 1, 1] = (self.world_y / 2.0) + (self.door_length / 2.0)
 
-        # Bottom Left Corner
-        self.walls[0, 2, 0] = (self.world_x/2.0)
-        self.walls[0, 2, 1] = (self.world_y/2.0) + (self.door_length/2.0)
+        # Wall 2 (Bottom of the world)
+        # Bottom Corner (Intersects Outer Wall)
+        self.walls[1, 0, 0] = (self.world_x/2.0)
+        self.walls[1, 0, 1] = 0.0
 
-        # Bottom Right Corner
-        self.walls[0, 3, 0] = self.walls[0, 2, 0] + self.wall_thickness
-        self.walls[0, 3, 1] = (self.world_y/2.0) + (self.door_length/2.0)
-
-        # Wall 2
-        # Top Left Corner
-        self.walls[1, 0, 0] = (self.world_x/2)
-        self.walls[1, 0, 1] = (self.world_y/2.0) - (self.door_length/2.0)
-
-        # Top Right Corner
-        self.walls[1, 1, 0] = self.walls[1, 0, 0] + self.wall_thickness
-        self.walls[1, 1, 1] = (self.world_y/2.0) - (self.door_length/2.0)
-
-        # Bottom Left Corner
-        self.walls[1, 2, 0] = (self.world_x/2.0)
-        self.walls[1, 2, 1] = 0.0
-
-        # Bottom Right Corner
-        self.walls[1, 3, 0] = self.walls[1, 2, 0] + self.wall_thickness
-        self.walls[1, 3, 1] = 0.0
+        # Top Corner (Corner protruding into world)
+        self.walls[1, 1, 0] = (self.world_x / 2.0)
+        self.walls[1, 1, 1] = (self.world_y / 2.0) - (self.door_length / 2.0)
 
         # Define threshold for doors
         # Threshold - Corner 1

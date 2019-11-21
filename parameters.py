@@ -15,16 +15,15 @@ class Parameters:
     agent_rad = 0.12  # Radius of turtlebot (used for size estimations and collision detection)
     max_vel = 0.22  # m/s
     max_rot_vel = 1.0  # rad / s
-    min_dist_to_wall = 0.05  # If the agent gets closer than this, consider it a collision
+    min_dist_to_wall = 0.01  # If the agent gets closer than this, consider it a collision
 
     # World Parameters
     x_dim = 10.0
     y_dim = 10.0
-    w_thick = 0  # Thickness of the walls in the world
     coll_penalty = -10.0
     stp_penalty = -1.0
     gl_reward = 100.0
-    n_walls = 2  # Number of internal walls in the world
+    n_walls = 2  # Number of internal walls in the world (DO NOT CHANGE)
     d_length = 2.0  # Length of the door in the world
 
     # EA Parameters

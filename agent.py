@@ -47,68 +47,66 @@ class Agent:
         wallDict = {}  # init wall/boundary dictionary
         # build boundary segments
         # format [X3,X4,Y3,Y4]
-        wallDict["worldLeft"] = [0,0,0,world_y]
-        wallDict["worldRight"] = [world_x,world_x,0,world_y]
-        wallDict["worldTop"] = [0,world_x,world_y,world_y]
-        wallDict["worldBottom"] = [0,world_x,0,0]
+        wallDict["worldLeft"] = [0, 0, 0, world_y]
+        wallDict["worldRight"] = [world_x, world_x, 0, world_y]
+        wallDict["worldTop"] = [0, world_x, world_y, world_y]
+        wallDict["worldBottom"] = [0, world_x, 0, 0]
 
         x1 = self.agent_pos[0]
         y1 = self.agent_pos[1]
 
         # Conduct scan
+        x_new = 0; y_new = 0
         for deg in range(self.sensor_res):
             dI = deg*(np.pi/180)  # convert to radians
 
             # first 90 degrees
             if deg <= 90:
-                xNew = -np.sin(dI)*self.sensor_radius + x1  # ccw X
-                yNew = np.cos(dI)*self.sensor_radius + y1  # ccw Y
+                x_new = -np.sin(dI)*self.sensor_radius + x1  # ccw X
+                y_new = np.cos(dI)*self.sensor_radius + y1  # ccw Y
 
             # 90-180
             if 90 < deg <= 180:
-                xNew = -np.cos(dI-0.5*np.pi)*self.sensor_radius + x1  # ccw X
-                yNew = -np.sin(dI-0.5*np.pi)*self.sensor_radius + y1  # ccw Y
+                x_new = -np.cos(dI-(np.pi/2.0))*self.sensor_radius + x1  # ccw X
+                y_new = -np.sin(dI-(np.pi/2.0))*self.sensor_radius + y1  # ccw Y
 
             # 180-270
             if 180 < deg <= 270:
-                xNew = np.sin(dI-np.pi)*self.sensor_radius + x1  # ccw X
-                yNew = -np.cos(dI-np.pi)*self.sensor_radius + y1  # ccw Y
+                x_new = np.sin(dI-np.pi)*self.sensor_radius + x1  # ccw X
+                y_new = -np.cos(dI-np.pi)*self.sensor_radius + y1  # ccw Y
 
             # 270-360
             if 270 < deg <= 360:
-                xNew = np.cos(dI-(3.0/2.0)*np.pi)*self.sensor_radius + x1  # ccw X
-                yNew = np.sin(dI-(3.0/2.0)*np.pi)*self.sensor_radius + y1  # ccw Y
+                x_new = np.cos(dI-(3.0*np.pi/2.0))*self.sensor_radius + x1  # ccw X
+                y_new = np.sin(dI-(3.0*np.pi/2.0))*self.sensor_radius + y1  # ccw Y
 
-            for w in range(walls.shape[0]):
-                # build wall segments
-                # format [X3,X4,Y3,Y4]
-                wallDict["left"] = [walls[w,0,0], walls[w,2,0], walls[w,0,1], walls[w,2,1]]
-                wallDict["right"] = [walls[w,1,0], walls[w,3,0], walls[w,1,1], walls[w,3,1]]
-                wallDict["top"] = [walls[w,0,0], walls[w,1,0], walls[w,0,1], walls[w,1,1]]
-                wallDict["bottom"] = [walls[w,2,0], walls[w,3,0], walls[w,2,1], walls[w,3,1]]
-                
-                for key in wallDict:
-                    # loop through each part of the rectangle and check if it intersects
-                    x3 = wallDict[key][0]+np.random.uniform(low = 0, high=0.1)
-                    x4 = wallDict[key][1]+np.random.uniform(low = 0, high=0.1)
-                    y3 = wallDict[key][2]+np.random.uniform(low = 0, high=0.1)
-                    y4 = wallDict[key][3]+np.random.uniform(low = 0, high=0.1)
-                    # direction vector A
-                    uAP1 = (x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)
-                    uAP2 = (y4-y3)*(xNew-x1) - (x4-x3)*(yNew-y1)
-                    uA = np.true_divide(uAP1,uAP2)
-                    # direction vector B
-                    uBP1 = (xNew-x1)*(y1-y3) - (yNew-y1)*(x1-x3)
-                    uBP2 = (y4-y3)*(xNew-x1) - (x4-x3)*(yNew-y1)
-                    uB = np.true_divide(uBP1,uBP2)
+            # build wall segments
+            # format [X3,X4,Y3,Y4]
+            wallDict["wall1"] = [walls[0, 0, 0], walls[0, 1, 0], walls[0, 0, 1], walls[0, 1, 1]]
+            wallDict["wall2"] = [walls[1, 0, 0], walls[1, 1, 0], walls[1, 0, 1], walls[1, 1, 1]]
 
-                    if (0 <= uA <= 1) and (0 <= uB <= 1):
-                        # found an intersection, get the distance
-                        xIntersect = x1 + (uA*(xNew-x1))
-                        yIntersect = y1 + (uA*(yNew-y1))
-                        r = np.sqrt((xIntersect-x1) ** 2 + (yIntersect-y1)**2)
-                        self.lidar_sensors[deg] = r
-                    # leave alone if not intersect and set to inf after checking all lines
+            for key in wallDict:
+                # loop through each part of the rectangle and check if it intersects
+                x3 = wallDict[key][0] + np.random.uniform(low=0, high=0.1)
+                x4 = wallDict[key][1] + np.random.uniform(low=0, high=0.1)
+                y3 = wallDict[key][2] + np.random.uniform(low=0, high=0.1)
+                y4 = wallDict[key][3] + np.random.uniform(low=0, high=0.1)
+                # direction vector A
+                uAP1 = (x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)
+                uAP2 = (y4-y3)*(x_new-x1) - (x4-x3)*(y_new-y1)
+                uA = np.true_divide(uAP1,uAP2)
+                # direction vector B
+                uBP1 = (x_new-x1)*(y1-y3) - (y_new-y1)*(x1-x3)
+                uBP2 = (y4-y3)*(x_new-x1) - (x4-x3)*(y_new-y1)
+                uB = np.true_divide(uBP1,uBP2)
+
+                if (0 <= uA <= 1) and (0 <= uB <= 1):
+                    # found an intersection, get the distance
+                    xIntersect = x1 + (uA*(x_new-x1))
+                    yIntersect = y1 + (uA*(y_new-y1))
+                    r = np.sqrt((xIntersect-x1) ** 2 + (yIntersect-y1)**2)
+                    self.lidar_sensors[deg] = r
+                # leave alone if not intersect and set to inf after checking all lines
             if self.lidar_sensors[deg] == 0:
                 self.lidar_sensors[deg] = 3.5
         return self.lidar_sensors
@@ -151,7 +149,6 @@ class Agent:
         illegal = self.collision_detection(x_new, y_new, walls, world_x, world_y)
         if not illegal:
             self.agent_pos = [x_new, y_new, theta_new]
-            # print(self.agent_pos)
 
         return illegal
 
@@ -168,12 +165,23 @@ class Agent:
             collision = True
         elif y_new <= 0 + dist or y_new >= world_y - dist:  # Checks outer wall
             collision = True
-        elif walls[0, 0, 0] - dist <= x_new <= walls[0, 3, 0] + dist and walls[0, 3, 1] - dist <= y_new <= walls[0, 0, 1] + dist:  # Checks wall 0
+        elif walls[0, 1, 0] - dist <= x_new <= walls[0, 1, 0] + dist and walls[0, 1, 1] - dist <= y_new <= walls[0, 1, 1] + dist:  # Checks wall 0
             collision = True
-        elif walls[1, 0, 0] - dist <= x_new <= walls[1, 3, 0] + dist and walls[1, 3, 1] - dist <= y_new <= walls[1, 0, 1] + dist:  # Checks wall 1
+        elif walls[1, 1, 0] - dist <= x_new <= walls[1, 1, 0] + dist and walls[1, 1, 1] - dist <= y_new <= walls[1, 1, 1] + dist:  # Checks wall 1
             collision = True
+        elif walls[0, 1, 0] == walls[1, 1, 0]:  # Checks teleporting when Agent must cross door in Y-Direction
+            if self.agent_pos[1] >= walls[0, 1, 1] + dist and y_new <= walls[0, 1, 1] + dist:
+                collision = True
+            elif self.agent_pos[1] <= walls[0, 1, 1] - dist and y_new >= walls[0, 1, 1] - dist:
+                collision = True
+        elif walls[0, 1, 1] == walls[1, 1, 1]:  # Checks teleporting when Agent must cross door in X-Direction
+            if self.agent_pos[0] <= walls[0, 2, 0] - dist and x_new >= walls[0, 2, 0] - dist:
+                collision = True
+            elif self.agent_pos[0] >= walls[1, 2, 0] + dist and x_new <= walls[1, 2, 0] + dist:
+                collision = True
 
         # if collision:
         #     print("COLLISION DETECTED")
 
         return collision
+

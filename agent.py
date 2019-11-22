@@ -89,10 +89,10 @@ class Agent:
                # http://www.cs.swan.ac.uk/~cssimon/line_intersection.html following this algorithm
                 # http://www.jeffreythompson.org/collision-detection/line-rect.php the actual code is from here
                 # make the wall/boundary noise by adding in up to 10 cm to the location
-                x3 = wallDict[key][0] + np.random.uniform(low = 0, high=0.1)
-                x4 = wallDict[key][1] + np.random.uniform(low = 0, high=0.1)
-                y3 = wallDict[key][2] + np.random.uniform(low = 0, high=0.1)
-                y4 = wallDict[key][3] + np.random.uniform(low = 0, high=0.1)
+                x3 = wallDict[key][0] # + np.random.uniform(low = 0, high=0.1)
+                x4 = wallDict[key][1] # + np.random.uniform(low = 0, high=0.1)
+                y3 = wallDict[key][2] # + np.random.uniform(low = 0, high=0.1)
+                y4 = wallDict[key][3] # + np.random.uniform(low = 0, high=0.1)
                 # direction vector A
                 uAP1 = ((x4 - x3) * (y_Old - y3)) - ((y4 - y3) * (x_Old - x3))
                 uAP2 = ((y4 - y3) * (x_new - x_Old)) - ((x4 - x3) * (y_new - y_Old))
@@ -181,10 +181,6 @@ class Agent:
                 collision = True
             elif self.agent_pos[1] <= walls[0, 1, 1] - dist and y_new >= walls[0, 1, 1] - dist:
                 collision = True
-
-
-        # if collision:
-        #     print("COLLISION DETECTED")
 
         return collision
 

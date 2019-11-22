@@ -40,7 +40,7 @@ class World:
         self.walls[1, 1, 0] = (self.world_x / 2.0)
         self.walls[1, 1, 1] = (self.world_y / 2.0) - (self.door_length / 2.0)
 
-        print(self.walls)
+        # print(self.walls)
 
         # Define threshold for doors
         # Threshold - Corner 1

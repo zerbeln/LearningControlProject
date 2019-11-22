@@ -84,7 +84,7 @@ class World:
                     goal = True
 
         elif self.agent_starting_room == 2:  # Agent starts in room 2 and crosses to room 1
-            if self.threshold[0, 0, 0] == self.threshold[0, 1, 0]:  # Crosses in X-Direction
+            if self.threshold[0, 0] == self.threshold[1, 0]:  # Crosses in X-Direction
                 if agent_pos[0] + agent_rad < self.threshold[0, 0] and agent_pos[0] - agent_rad < self.threshold[0, 0]:
                     goal = True
             else:  # Crosses in Y-Direction

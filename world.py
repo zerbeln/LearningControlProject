@@ -24,7 +24,7 @@ class World:
 
         # Wall 1 (Top of the world)
         # Top Corner
-        self.walls[0, 0, 0] = (self.world_x/2)
+        self.walls[0, 0, 0] = (self.world_x/2.0)
         self.walls[0, 0, 1] = self.world_y
 
         # Bottom Corner (Corner protruding into world)
@@ -39,6 +39,8 @@ class World:
         # Top Corner (Corner protruding into world)
         self.walls[1, 1, 0] = (self.world_x / 2.0)
         self.walls[1, 1, 1] = (self.world_y / 2.0) - (self.door_length / 2.0)
+
+        print(self.walls)
 
         # Define threshold for doors
         # Threshold - Corner 1

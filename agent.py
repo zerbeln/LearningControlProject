@@ -27,7 +27,7 @@ class Agent:
         Gives the agent a new starting position in the world (Complete world reset)
         :return:
         """
-        self.agent_start_pos = [3.0, 5.0, 0.0]
+        self.agent_start_pos = [1.0, 1.0, 0.0]
         self.agent_pos = self.agent_start_pos
 
     def reset_agent_to_start(self):
@@ -87,18 +87,18 @@ class Agent:
 
             for key in wallDict:
                 # loop through each part of the rectangle and check if it intersects
-                x3 = wallDict[key][0] + np.random.uniform(low=0, high=0.1)
-                x4 = wallDict[key][1] + np.random.uniform(low=0, high=0.1)
-                y3 = wallDict[key][2] + np.random.uniform(low=0, high=0.1)
-                y4 = wallDict[key][3] + np.random.uniform(low=0, high=0.1)
+                x3 = wallDict[key][0] #+ np.random.uniform(low=0, high=0.1)
+                x4 = wallDict[key][1] #+ np.random.uniform(low=0, high=0.1)
+                y3 = wallDict[key][2] #+ np.random.uniform(low=0, high=0.1)
+                y4 = wallDict[key][3] #+ np.random.uniform(low=0, high=0.1)
                 # direction vector A
                 uAP1 = (x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)
                 uAP2 = (y4-y3)*(x_new-x1) - (x4-x3)*(y_new-y1)
-                uA = np.true_divide(uAP1,uAP2)
+                uA = np.true_divide(uAP1, uAP2)
                 # direction vector B
                 uBP1 = (x_new-x1)*(y1-y3) - (y_new-y1)*(x1-x3)
                 uBP2 = (y4-y3)*(x_new-x1) - (x4-x3)*(y_new-y1)
-                uB = np.true_divide(uBP1,uBP2)
+                uB = np.true_divide(uBP1, uBP2)
 
                 if (0 <= uA <= 1) and (0 <= uB <= 1):
                     # found an intersection, get the distance
@@ -170,15 +170,16 @@ class Agent:
         elif walls[1, 1, 0] - dist <= x_new <= walls[1, 1, 0] + dist and walls[1, 1, 1] - dist <= y_new <= walls[1, 1, 1] + dist:  # Checks wall 1
             collision = True
         elif walls[0, 1, 0] == walls[1, 1, 0]:  # Checks teleporting when Agent must cross door in Y-Direction
+            if self.agent_pos[0] <= walls[0, 1, 0] - dist and x_new >= walls[0, 1, 0] - dist:
+                collision = True
+            elif self.agent_pos[0] >= walls[1, 1, 0] + dist and x_new <= walls[1, 1, 0] + dist:
+                collision = True
+        elif walls[0, 1, 1] == walls[1, 1, 1]:  # Checks teleporting when Agent must cross door in X-Direction
             if self.agent_pos[1] >= walls[0, 1, 1] + dist and y_new <= walls[0, 1, 1] + dist:
                 collision = True
             elif self.agent_pos[1] <= walls[0, 1, 1] - dist and y_new >= walls[0, 1, 1] - dist:
                 collision = True
-        elif walls[0, 1, 1] == walls[1, 1, 1]:  # Checks teleporting when Agent must cross door in X-Direction
-            if self.agent_pos[0] <= walls[0, 2, 0] - dist and x_new >= walls[0, 2, 0] - dist:
-                collision = True
-            elif self.agent_pos[0] >= walls[1, 2, 0] + dist and x_new <= walls[1, 2, 0] + dist:
-                collision = True
+
 
         # if collision:
         #     print("COLLISION DETECTED")

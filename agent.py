@@ -7,7 +7,7 @@ from math import sin, cos
 
 class Agent:
 
-    def __init__(self, p):
+    def __init__(self, p, x, y, theta):
         self.sensor_res = p.sensor_resolution
         self.lidar_sensors = np.zeros(self.sensor_res)
         self.agent_pos = np.zeros(3)  # x, y, theta
@@ -20,14 +20,14 @@ class Agent:
         self.buffer = p.min_dist_to_wall
         self.collision_penalty = p.coll_penalty
         self.step_penalty = p.stp_penalty
-        self.set_agent_start_pos()
+        self.set_agent_start_pos(x, y, theta)
 
-    def set_agent_start_pos(self):
+    def set_agent_start_pos(self, x, y, theta):
         """
         Gives the agent a new starting position in the world (Complete world reset)
         :return:
         """
-        self.agent_start_pos = [1.0, 1.0, 0.0]
+        self.agent_start_pos = [x, y, theta]
         self.agent_pos = self.agent_start_pos
 
     def reset_agent_to_start(self):
@@ -37,23 +37,17 @@ class Agent:
         """
         self.agent_pos = self.agent_start_pos
 
-    def lidar_scan(self, world_x, world_y, walls):
+    def lidar_scan(self, wallDict):
         """
         This function is called when the agent needs to gather LIDAR inputs for the NN
         :return: vector of lidar scan with input size
         """
         # reset lidar each scan
         self.lidar_sensors = np.zeros(self.sensor_res)
-        wallDict = {}  # init wall/boundary dictionary
-        # build boundary segments
-        # format [X3,X4,Y3,Y4]
-        wallDict["worldLeft"] = [0, 0, 0, world_y]
-        wallDict["worldRight"] = [world_x, world_x, 0, world_y]
-        wallDict["worldTop"] = [0, world_x, world_y, world_y]
-        wallDict["worldBottom"] = [0, world_x, 0, 0]
 
-        x_Old = self.agent_pos[0]
-        y_Old = self.agent_pos[1]
+        # Current agent position
+        agent_x = self.agent_pos[0]
+        agent_y = self.agent_pos[1]
 
         # Conduct scan
         x_new = 0; y_new = 0
@@ -62,52 +56,53 @@ class Agent:
 
             # first 90 degrees
             if deg <= 90:
-                x_new = -np.sin(dI)*self.sensor_radius + x_Old  # ccw X
-                y_new = np.cos(dI)*self.sensor_radius + y_Old  # ccw Y
+                x_new = -np.sin(dI)*self.sensor_radius + agent_x  # ccw X
+                y_new = np.cos(dI)*self.sensor_radius + agent_y  # ccw Y
 
             # 90-180
             if 90 < deg <= 180:
-                x_new = -np.cos(dI-(np.pi/2.0))*self.sensor_radius + x_Old  # ccw X
-                y_new = -np.sin(dI-(np.pi/2.0))*self.sensor_radius + y_Old  # ccw Y
+                x_new = -np.cos(dI-(np.pi/2.0))*self.sensor_radius + agent_x  # ccw X
+                y_new = -np.sin(dI-(np.pi/2.0))*self.sensor_radius + agent_y  # ccw Y
 
             # 180-270
             if 180 < deg <= 270:
-                x_new = np.sin(dI-np.pi)*self.sensor_radius + x_Old  # ccw X
-                y_new = -np.cos(dI-np.pi)*self.sensor_radius + y_Old  # ccw Y
+                x_new = np.sin(dI-np.pi)*self.sensor_radius + agent_x  # ccw X
+                y_new = -np.cos(dI-np.pi)*self.sensor_radius + agent_y  # ccw Y
 
             # 270-360
             if 270 < deg <= 360:
-                x_new = np.cos(dI-(3.0*np.pi/2.0))*self.sensor_radius + x_Old  # ccw X
-                y_new = np.sin(dI-(3.0*np.pi/2.0))*self.sensor_radius + y_Old  # ccw Y
-
-            # build wall segments
-            # format [X3,X4,Y3,Y4]
-            wallDict["wall1"] = [walls[0, 0, 0], walls[0, 1, 0], walls[0, 0, 1], walls[0, 1, 1]]
-            wallDict["wall2"] = [walls[1, 0, 0], walls[1, 1, 0], walls[1, 0, 1], walls[1, 1, 1]]
+                x_new = np.cos(dI-(3.0*np.pi/2.0))*self.sensor_radius + agent_x  # ccw X
+                y_new = np.sin(dI-(3.0*np.pi/2.0))*self.sensor_radius + agent_y  # ccw Y
 
             for key in wallDict:
-               # http://www.cs.swan.ac.uk/~cssimon/line_intersection.html following this algorithm
+                # http://www.cs.swan.ac.uk/~cssimon/line_intersection.html following this algorithm
                 # http://www.jeffreythompson.org/collision-detection/line-rect.php the actual code is from here
                 # make the wall/boundary noise by adding in up to 10 cm to the location
-                x3 = wallDict[key][0] # + np.random.uniform(low = 0, high=0.1)
-                x4 = wallDict[key][1] # + np.random.uniform(low = 0, high=0.1)
-                y3 = wallDict[key][2] # + np.random.uniform(low = 0, high=0.1)
-                y4 = wallDict[key][3] # + np.random.uniform(low = 0, high=0.1)
+                x3 = wallDict[key][0]
+                x4 = wallDict[key][1]
+                y3 = wallDict[key][2]
+                y4 = wallDict[key][3]
                 # direction vector A
-                uAP1 = ((x4 - x3) * (y_Old - y3)) - ((y4 - y3) * (x_Old - x3))
-                uAP2 = ((y4 - y3) * (x_new - x_Old)) - ((x4 - x3) * (y_new - y_Old))
-                uA = np.true_divide(uAP1, uAP2)
+                uAP1 = ((x4 - x3) * (agent_y - y3)) - ((y4 - y3) * (agent_x - x3))
+                uAP2 = ((y4 - y3) * (x_new - agent_x)) - ((x4 - x3) * (y_new - agent_y))
+                if uAP2 == 0:  # Prevents division by 0
+                    uA = -1
+                else:
+                    uA = np.true_divide(uAP1, uAP2)
                 # direction vector B
-                uBP1 = ((x_new - x_Old) * (y_Old - y3)) - ((y_new - y_Old) * (x_Old - x3))
-                uBP2 = ((y4 - y3) * (x_new - x_Old)) - ((x4 - x3) * (y_new - y_Old))
-                uB = np.true_divide(uBP1, uBP2)
+                uBP1 = ((x_new - agent_x) * (agent_y - y3)) - ((y_new - agent_y) * (agent_x - x3))
+                uBP2 = ((y4 - y3) * (x_new - agent_x)) - ((x4 - x3) * (y_new - agent_y))
+                if uBP2 == 0:  # Prevents division by 0
+                    uB = -1
+                else:
+                    uB = np.true_divide(uBP1, uBP2)
 
                 if (0 <= uA <= 1) and (0 <= uB <= 1):
                     # found an intersection, get the distance
-                    xIntersect = x_Old + (uA * (x_new - x_Old))
-                    yIntersect = y_Old + (uA * (y_new - y_Old))
-                    r = np.sqrt((xIntersect - x_Old) ** 2 + (yIntersect - y_Old) **2)
-                    self.lidar_sensors[deg] = r
+                    x_intersect = agent_x + (uA * (x_new - agent_x))
+                    y_intersect = agent_y + (uA * (y_new - agent_y))
+                    r = np.sqrt((x_intersect - agent_x)**2 + (y_intersect - agent_y)**2)
+                    self.lidar_sensors[deg] = r  # + np.random.normal(0, 0.1)
                 # leave alone if not intersect and set to inf after checking all lines
             if self.lidar_sensors[deg] == 0:
                 self.lidar_sensors[deg] = 3.5

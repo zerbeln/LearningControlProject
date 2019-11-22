@@ -95,17 +95,5 @@ class EvoAlg:
         :return: None
         """
 
-        # Combine fitness arrays
-        # for pol_id in range(self.total_pop_size):
-        #     off_pol_id = 0
-        #     if pol_id < self.parent_psize:
-        #         self.pops[pol_id] = self.parent_pop[pol_id].copy()
-        #         self.fitness[pol_id] = self.parent_fitness[pol_id]
-        #     else:
-        #         self.pops[pol_id] = self.offspring_pop[off_pol_id].copy()
-        #         self.fitness[pol_id] = self.offspring_fitness[off_pol_id]
-        #         off_pol_id += 1
-
-
         self.fitness = np.concatenate((self.parent_fitness, self.offspring_fitness), axis=None)
         self.pops = np.concatenate((self.parent_pop, self.offspring_pop), axis=0)

@@ -101,6 +101,7 @@ def main():
     wld.set_agent_starting_room(ag.agent_pos)
 
     for sr in range(p.stat_runs):
+        print("Stat Run: ", sr)
         ea.reset_populations()
         best_fit = [0 for _ in range(p.generations+1)]
 
@@ -120,7 +121,7 @@ def main():
 
         # Train population ------------------------------------------------------------------------------------
         for gen in range(p.generations):
-            print("Generation: ", gen)
+            # print("Generation: ", gen)
             for i in range(p.offspring_pop_size):
                 nn.get_nn_weights(ea.pops[i])
                 reward = try_network(nn, wld, ag, wallDict)
@@ -130,13 +131,13 @@ def main():
             if gen == p.generations-1:
                 ea.combine_pops()
             best_fit[gen+1] = max(ea.fitness)  # Record best fitness after each gen
-            print('Best Reward: ', max(ea.fitness))
+            # print('Best Reward: ', max(ea.fitness))
 
         # Test best NN ------------------------------------------------------------------------------------------
         best_nn = np.argmax(ea.fitness)
         nn.get_nn_weights(ea.pops[best_nn])
         reward, robot_path = test_best_network(nn, wld, ag, wallDict)
-        print("The final reward is: ", reward)
+        # print("The final reward is: ", reward)
 
         # Create data files ------------------------------------------------------------------------------------
         create_output_files("BestFit.csv", best_fit)  # Records best fitness for each gen for learning curve

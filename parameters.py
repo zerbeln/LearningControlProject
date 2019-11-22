@@ -3,8 +3,8 @@
 class Parameters:
 
     # Test Parameters
-    stat_runs = 1  # Number of statistical runs to perform
-    generations = 3  # Number of generations for training NN
+    stat_runs = 5  # Number of statistical runs to perform
+    generations = 800  # Number of generations for training NN
     time_step = 0.5  # Amount of time (seconds) agent moves each step
     agent_steps = 100  # Number of steps agent is allowed to move
 

@@ -96,7 +96,7 @@ def main():
 
     # Create instances of agents and worlds
     wld = World(p)
-    ag = Agent(p, 8.0, 8.0, 0.0)  # (Parameters, X, Y, Theta)
+    ag = Agent(p, 3.0, 5.0, 10.0)  # (Parameters, X, Y, Theta)
     wld.world_config1()
     wld.set_agent_starting_room(ag.agent_pos)
 

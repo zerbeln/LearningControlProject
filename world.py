@@ -51,6 +51,8 @@ class World:
         self.threshold[1, 0] = (self.world_x/2)
         self.threshold[1, 1] = (self.world_y/2) - (self.door_length/2.0)
 
+        print(self.threshold)
+
     def set_agent_starting_room(self, agent_pos):
         if self.threshold[0, 0] == self.threshold[1, 0]:  # If x values are the same
             if agent_pos[0] < self.threshold[0, 0]:

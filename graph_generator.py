@@ -24,11 +24,12 @@ def create_learning_curve():
     plt.plot(x_axis, y_axis)
     plt.xlabel('Generations')
     plt.ylabel('Best Fitness')
-    plt.show()
+    plt.savefig('LearningCurve.png')
+    # plt.show()
 
 def create_robot_path_plot(srun):
-    x_axis = [0.0 for _ in range(p.agent_steps)]
-    y_axis = [0.0 for _ in range(p.agent_steps)]
+    x_coords = np.zeros(p.agent_steps)
+    y_coords = np.zeros(p.agent_steps)
     data_input = [[] for _ in range(p.stat_runs)]
 
     with open('Output_Data/RobotPath.csv') as csv_file:
@@ -47,16 +48,13 @@ def create_robot_path_plot(srun):
             processed_data.append(sub_l)
 
     for stp in range(p.agent_steps):
-        x_axis[stp] = processed_data[3*stp]
-        y_axis[stp] = processed_data[3*stp + 1]
+        x_coords[stp] = processed_data[3*stp]
+        y_coords[stp] = processed_data[3*stp + 1]
 
     plt.figure()
-    plt.plot(x_axis, y_axis)
+    plt.plot(x_coords, y_coords)
 
     # ACTUAL WORLD ---------------------------
-    plt.xlim([0, p.x_dim])
-    plt.ylim([0, p.y_dim])
-    plt.gca().set_aspect('equal', adjustable='box')
     plt.plot((p.x_dim/2, p.x_dim/2), (0, (p.y_dim/2) - (p.d_length/2)), 'k-', linewidth=6, label='top wall')
     plt.plot((p.x_dim/2, p.x_dim/2), ((p.y_dim/2) + (p.d_length/2), p.y_dim), 'k-', linewidth=6, label='bottom wall')
 
@@ -70,16 +68,19 @@ def create_robot_path_plot(srun):
     # ax = plt.gca()
     # ax.add_patch(circle)
 
-    # plt.autoscale(False)
+    #plt.gca().set_autoscale(False)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.gca().set_xlim(0, p.x_dim)
+    plt.gca().set_ylim(0, p.y_dim)
     plt.xlabel('X - Coordinates')
     plt.ylabel('Y - Coordinates')
-    plt.savefig('spinner.png')
+    plt.savefig('RobotPath.png')
     # plt.show()
 
 
 def show_plots():
-    # create_learning_curve()
-    create_robot_path_plot(1)
+    create_learning_curve()
+    create_robot_path_plot(0)
 
 show_plots()
 

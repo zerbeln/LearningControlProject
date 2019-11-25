@@ -71,7 +71,6 @@ def main():
     ea.offspring_pop = ea.parent_pop.copy()  # Produce K offspring
     ea.mutate()  # Mutate offspring population
 
-
     # Train population
     for gen in range(p.generations):
         print("Generation: ", gen)

@@ -94,6 +94,6 @@ class EvoAlg:
         Combine parent and offspring populations into single population array
         :return: None
         """
-        # Combine fitness arrays
+
         self.fitness = np.concatenate((self.parent_fitness, self.offspring_fitness), axis=None)
         self.pops = np.concatenate((self.parent_pop, self.offspring_pop), axis=0)

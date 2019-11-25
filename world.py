@@ -24,7 +24,7 @@ class World:
 
         # Wall 1 (Top of the world)
         # Top Corner
-        self.walls[0, 0, 0] = (self.world_x/2)
+        self.walls[0, 0, 0] = (self.world_x/2.0)
         self.walls[0, 0, 1] = self.world_y
 
         # Bottom Corner (Corner protruding into world)
@@ -40,6 +40,8 @@ class World:
         self.walls[1, 1, 0] = (self.world_x / 2.0)
         self.walls[1, 1, 1] = (self.world_y / 2.0) - (self.door_length / 2.0)
 
+        # print(self.walls)
+
         # Define threshold for doors
         # Threshold - Corner 1
         self.threshold[0, 0] = (self.world_x/2)
@@ -48,6 +50,8 @@ class World:
         # Threshold - Corner 2
         self.threshold[1, 0] = (self.world_x/2)
         self.threshold[1, 1] = (self.world_y/2) - (self.door_length/2.0)
+
+        print(self.threshold)
 
     def set_agent_starting_room(self, agent_pos):
         if self.threshold[0, 0] == self.threshold[1, 0]:  # If x values are the same
@@ -82,7 +86,7 @@ class World:
                     goal = True
 
         elif self.agent_starting_room == 2:  # Agent starts in room 2 and crosses to room 1
-            if self.threshold[0, 0, 0] == self.threshold[0, 1, 0]:  # Crosses in X-Direction
+            if self.threshold[0, 0] == self.threshold[1, 0]:  # Crosses in X-Direction
                 if agent_pos[0] + agent_rad < self.threshold[0, 0] and agent_pos[0] - agent_rad < self.threshold[0, 0]:
                     goal = True
             else:  # Crosses in Y-Direction

@@ -46,11 +46,13 @@ class Agent:
         # Current agent position
         agent_x = self.agent_pos[0]
         agent_y = self.agent_pos[1]
-
+        agent_theta = self.agent_pos[2]
+        
         # Conduct scan
         x_new = 0; y_new = 0
         for deg in range(self.sensor_res):
             dI = deg*(np.pi/180)  # convert to radians
+            dI += agent_theta
 
             # first 90 degrees
             if deg <= 90:
@@ -68,7 +70,7 @@ class Agent:
                 y_new = -np.cos(dI-np.pi)*self.sensor_radius + agent_y  # ccw Y
 
             # 270-360
-            if 270 < deg <= 360:
+            if deg > 270:
                 x_new = np.cos(dI-(3.0*np.pi/2.0))*self.sensor_radius + agent_x  # ccw X
                 y_new = np.sin(dI-(3.0*np.pi/2.0))*self.sensor_radius + agent_y  # ccw Y
 
@@ -100,7 +102,7 @@ class Agent:
                     x_intersect = agent_x + (uA * (x_new - agent_x))
                     y_intersect = agent_y + (uA * (y_new - agent_y))
                     r = np.sqrt((x_intersect - agent_x)**2 + (y_intersect - agent_y)**2)
-                    self.lidar_sensors[deg] = r  # + np.random.normal(0, 0.1)
+                    self.lidar_sensors[deg] = r + np.random.normal(0, 0.1)
                 # leave alone if not intersect and set to inf after checking all lines
             if self.lidar_sensors[deg] == 0:
                 self.lidar_sensors[deg] = 3.5

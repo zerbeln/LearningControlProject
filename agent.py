@@ -108,7 +108,7 @@ class Agent:
                 self.lidar_sensors[deg] = 3.5
         return self.lidar_sensors
 
-    def agent_step(self, nn_outputs, time_step, walls, world_x, world_y):
+    def agent_step(self, nn_outputs, time_step, walls, world_x, world_y, threshold):
         """
         What about negative velocity and theta
         Agent executes movement based on control signals from NN
@@ -143,13 +143,13 @@ class Agent:
 
         # Boundary checking -- if the new positions are illegal, reject and set collision = true
         # Keep the previous coordinates
-        illegal = self.collision_detection(x_new, y_new, walls, world_x, world_y)
+        illegal = self.collision_detection(x_new, y_new, walls, world_x, world_y, threshold)
         if not illegal:
             self.agent_pos = [x_new, y_new, theta_new]
 
         return illegal
 
-    def collision_detection(self, x_new, y_new, walls, world_x, world_y):
+    def collision_detection(self, x_new, y_new, walls, world_x, world_y, threshold):
         """
         This function is called every time step to detect if the agent has run into anything
         Calculates in C-space
@@ -166,16 +166,19 @@ class Agent:
             collision = True
         elif walls[1, 1, 0] - dist <= x_new <= walls[1, 1, 0] + dist and walls[1, 1, 1] - dist <= y_new <= walls[1, 1, 1] + dist:  # Checks wall 1
             collision = True
-        elif walls[0, 1, 0] == walls[1, 1, 0]:  # Checks teleporting when Agent must cross door in Y-Direction
-            if self.agent_pos[0] <= walls[0, 1, 0] - dist and x_new >= walls[0, 1, 0] - dist:
-                collision = True
-            elif self.agent_pos[0] >= walls[1, 1, 0] + dist and x_new <= walls[1, 1, 0] + dist:
-                collision = True
-        elif walls[0, 1, 1] == walls[1, 1, 1]:  # Checks teleporting when Agent must cross door in X-Direction
-            if self.agent_pos[1] >= walls[0, 1, 1] + dist and y_new <= walls[0, 1, 1] + dist:
-                collision = True
-            elif self.agent_pos[1] <= walls[0, 1, 1] - dist and y_new >= walls[0, 1, 1] - dist:
-                collision = True
+        elif walls[0, 1, 0] == walls[1, 1, 0]:  # Checks teleporting when Agent must cross door in X-Direction
+            if self.agent_pos[1] <= threshold[0, 1] or self.agent_pos[1] >= threshold[1, 1]:  # Agent not in front of door
+                if self.agent_pos[0] <= walls[0, 1, 0] - dist and x_new >= walls[0, 1, 0] - dist:
+                    collision = True
+                elif self.agent_pos[0] >= walls[1, 1, 0] + dist and x_new <= walls[1, 1, 0] + dist:
+                    collision = True
+
+        elif walls[0, 1, 1] == walls[1, 1, 1]:  # Checks teleporting when Agent must cross door in Y-Direction
+            if self.agent_pos[0] <= threshold[0, 0] or self.agent_pos[0] >= threshold[1, 0]:  # Agent not in front of door
+                if self.agent_pos[1] >= walls[0, 1, 1] + dist and y_new <= walls[0, 1, 1] + dist:
+                    collision = True
+                elif self.agent_pos[1] <= walls[0, 1, 1] - dist and y_new >= walls[0, 1, 1] - dist:
+                    collision = True
 
         return collision
 

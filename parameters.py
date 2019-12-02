@@ -3,8 +3,8 @@
 class Parameters:
 
     # Test Parameters
-    stat_runs = 2  # Number of statistical runs to perform
-    generations = 800  # Number of generations for training NN
+    stat_runs = 1  # Number of statistical runs to perform
+    generations = 10  # Number of generations for training NN
     time_step = 0.5  # Amount of time (seconds) agent moves each step
     agent_steps = 100  # Number of steps agent is allowed to move
 
@@ -15,7 +15,7 @@ class Parameters:
     detection_radius = 3.5  # Meters
     agent_rad = 0.12  # Radius of turtlebot (used for size estimations and collision detection)
     max_vel = 1.5  # m/s
-    max_rot_vel = 1.0  # rad / s
+    max_rot_vel = 0.5  # rad / s
     min_dist_to_wall = 0.01  # If the agent gets closer than this, consider it a collision
 
     # World Parameters

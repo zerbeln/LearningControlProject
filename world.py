@@ -45,11 +45,11 @@ class World:
         # Define threshold for doors
         # Threshold - Corner 1
         self.threshold[0, 0] = (self.world_x/2)
-        self.threshold[0, 1] = (self.world_y/2) + (self.door_length/2.0)
+        self.threshold[0, 1] = (self.world_y/2) - (self.door_length/2.0)
 
         # Threshold - Corner 2
         self.threshold[1, 0] = (self.world_x/2)
-        self.threshold[1, 1] = (self.world_y/2) - (self.door_length/2.0)
+        self.threshold[1, 1] = (self.world_y/2) + (self.door_length/2.0)
 
         print(self.threshold)
 

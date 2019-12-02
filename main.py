@@ -17,7 +17,7 @@ def try_network(nn, wld, ag, wallDict):
     for step in range(p.agent_steps):
         sweep = ag.lidar_scan(wallDict)
         nn.get_outputs(sweep)
-        collision = ag.agent_step(nn.out_layer, p.time_step, wld.walls, wld.world_x, wld.world_y)
+        collision = ag.agent_step(nn.out_layer, p.time_step, wld.walls, wld.world_x, wld.world_y, wld.threshold)
 
         # calculate reward
         step_reward, goal = wld.calculate_reward(ag.agent_pos, ag.body_radius, collision)
@@ -43,7 +43,7 @@ def test_best_network(nn, wld, ag, wallDict):
     for step in range(p.agent_steps):
         sweep = ag.lidar_scan(wallDict)
         nn.get_outputs(sweep)
-        collision = ag.agent_step(nn.out_layer, p.time_step, wld.walls, wld.world_x, wld.world_y)
+        collision = ag.agent_step(nn.out_layer, p.time_step, wld.walls, wld.world_x, wld.world_y, wld.threshold)
 
         # Record path of robot
         robot_path[step+1][0] = ag.agent_pos[0]
@@ -56,6 +56,11 @@ def test_best_network(nn, wld, ag, wallDict):
 
         # Stop if we reached the goal
         if goal:
+            while step < p.agent_steps:
+                robot_path[step + 1][0] = ag.agent_pos[0]
+                robot_path[step + 1][1] = ag.agent_pos[1]
+                robot_path[step + 1][2] = ag.agent_pos[2]
+                step += 1
             break
 
     return reward, robot_path
@@ -96,7 +101,7 @@ def main():
 
     # Create instances of agents and worlds
     wld = World(p)
-    ag = Agent(p, 3.0, 5.0, 10.0)  # (Parameters, X, Y, Theta)
+    ag = Agent(p, 3.0, 2.0, 0.0)  # (Parameters, X, Y, Theta)
     wld.world_config1()
     wld.set_agent_starting_room(ag.agent_pos)
 

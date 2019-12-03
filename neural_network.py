@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
-
+import csv
 
 class NeuralNetwork:
 
@@ -56,6 +56,20 @@ class NeuralNetwork:
             else:
                 self.weights2[weight_count] = weight_vec[w]
                 weight_count += 1
+
+    def get_nn_weights_from_file(self, filename):
+
+        nn_weights = []
+        with open(filename) as weights_file:
+            read_weights = csv.reader(weights_file, delimiter=',')
+
+            for line in read_weights:
+                nn_weights = line
+
+        for i in range(len(nn_weights)):
+            nn_weights[i] = float(nn_weights[i])
+
+        self.get_nn_weights(nn_weights)
 
     def get_inputs(self, input_vec):  # Get inputs from state-vector
         """
@@ -132,6 +146,10 @@ class NeuralNetwork:
         :param lidar:
         :return:
         """
+
+        if np.size(lidar) != 360:
+            print("Lidar is the wrong size. Length of LIDAR is ", len(lidar))
+            exit()
 
         stop0 = 0
         stop1 = 45

@@ -27,11 +27,9 @@ def create_learning_curve():
     plt.savefig('LearningCurve.png')
     # plt.show()
 
-def create_robot_path_plot(srun):
-    x_coords = np.zeros(p.agent_steps)
-    y_coords = np.zeros(p.agent_steps)
-    data_input = [[] for _ in range(p.stat_runs)]
+def create_robot_path_plot(srun, walls):
 
+    data_input = [[] for _ in range(p.stat_runs)]
     with open('Output_Data/RobotPath.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
@@ -47,16 +45,21 @@ def create_robot_path_plot(srun):
             sub_l = sub_l.strip('][')
             processed_data.append(sub_l)
 
+    x_coords = np.zeros(p.agent_steps)
+    y_coords = np.zeros(p.agent_steps)
     for stp in range(p.agent_steps):
         x_coords[stp] = processed_data[3*stp]
         y_coords[stp] = processed_data[3*stp + 1]
 
     plt.figure()
-    plt.plot(x_coords, y_coords)
+    plt.plot(x_coords, y_coords, 'b')
+    plt.plot(x_coords[0], y_coords[0], 'bo', markersize=10)
+    plt.plot(x_coords[p.agent_steps-1], y_coords[p.agent_steps-1], 'bX', markersize=10)
 
     # ACTUAL WORLD ---------------------------
-    plt.plot((p.x_dim/2, p.x_dim/2), (0, (p.y_dim/2) - (p.d_length/2)), 'k-', linewidth=6, label='top wall')
-    plt.plot((p.x_dim/2, p.x_dim/2), ((p.y_dim/2) + (p.d_length/2), p.y_dim), 'k-', linewidth=6, label='bottom wall')
+
+    plt.plot((walls[0, 0, 0], walls[0, 1, 0]), (walls[0, 0, 1], walls[0, 1, 1]), 'k-', linewidth=6, label='top wall')
+    plt.plot((walls[1, 0, 0], walls[1, 1, 0]), (walls[1, 0, 1], walls[1, 1, 1]), 'k-', linewidth=6, label='bottom wall')
 
     # CHONK WORLD ----------------------------
     # plt.xlim([0, 30])
@@ -78,9 +81,7 @@ def create_robot_path_plot(srun):
     plt.show()
 
 
-def show_plots():
+def create_plots(srun, walls):
     create_learning_curve()
-    create_robot_path_plot(0)
-
-show_plots()
+    create_robot_path_plot(srun, walls)
 

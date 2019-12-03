@@ -3,6 +3,7 @@
 import neural_network as neu_net
 import evolutionary_algorithm as ev_alg
 from parameters import Parameters as p
+from graph_generator import create_plots
 from agent import Agent
 from world import World
 import numpy as np
@@ -100,57 +101,103 @@ def main():
     ea = ev_alg.EvoAlg(p)
 
     # Create instances of agents and worlds
-    wld = World(p)
-    ag = Agent(p, 3.0, 2.0, 0.0)  # (Parameters, X, Y, Theta)
-    wld.world_config1()
-    wld.set_agent_starting_room(ag.agent_pos)
+    wld1a = World(p); wld1b = World(p)
+    wld2a = World(p); wld2b = World(p)
 
-    for sr in range(p.stat_runs):
-        print("Stat Run: ", sr)
-        ea.reset_populations()
-        best_fit = [0 for _ in range(p.generations+1)]
+    # Initialize instances of agents in training worlds (Parameters, X, Y, Theta)
+    agent_instances = []
+    ag1 = Agent(p, 3.0, 2.0, 10.0)  # wld1a
+    agent_instances.append(ag1)
+    ag2 = Agent(p, 6.0, 7.0, 70.0)  # wld1b
+    agent_instances.append(ag2)
+    ag3 = Agent(p, 4.0, 2.0, 200.0)  # wld2a
+    agent_instances.append(ag3)
+    ag4 = Agent(p, 8.0, 6.0, 180.0)  # wld2b
+    agent_instances.append(ag4)
 
-        # Build dictionary for LIDAR scans
-        wallDict = build_wall_dict(wld)
+    # Initialize instances of worlds for training set
+    training_set = []
+    wld1a.world_config1()
+    wld1a.set_agent_starting_room(ag1.agent_pos)
+    training_set.append(wld1a)
+    wld1b.world_config1()
+    wld1b.set_agent_starting_room(ag2.agent_pos)
+    training_set.append(wld1b)
+    wld2a.world_config2()
+    wld2a.set_agent_starting_room(ag3.agent_pos)
+    training_set.append(wld2a)
+    wld2b.world_config2()
+    wld2b.set_agent_starting_room(ag4.agent_pos)
+    training_set.append(wld2b)
 
-        # Test initial population -----------------------------------------------------------------------------
-        for i in range(ea.total_pop_size):
-            nn.get_nn_weights(ea.pops[i])
-            reward = try_network(nn, wld, ag, wallDict)
-            ea.fitness[i] = reward
+    # Build dictionaries for LIDAR scans
+    wall_dicts = []
+    wallDict1 = build_wall_dict(wld1a)
+    wall_dicts.append(wallDict1)
+    wall_dicts.append(wallDict1)
+    wallDict2 = build_wall_dict(wld2a)
+    wall_dicts.append(wallDict2)
+    wall_dicts.append(wallDict2)
 
-        best_fit[0] = max(ea.fitness)  # Records best initial fitness
-        ea.epsilon_greedy_select()
-        ea.offspring_pop = ea.parent_pop.copy()  # Produce K offspring
-        ea.mutate()  # Mutate offspring population
+    # Create test instances (not training set)
+    ag_test = Agent(p, 4.5, 3.1, 40.0)
+    wld_test = World(p)
+    wld_test.world_config2()
+    wld_test.set_agent_starting_room(ag_test.agent_pos)
+    wallDictTest = build_wall_dict(wld_test)
 
-        # Train population ------------------------------------------------------------------------------------
-        for gen in range(p.generations):
-            # print("Generation: ", gen)
-            for i in range(p.offspring_pop_size):
+
+    if not p.run_graph_only:
+        for sr in range(p.stat_runs):
+            print("Stat Run: ", sr)
+            ea.reset_populations()
+            best_fit = [0 for _ in range(p.generations+1)]
+
+            # Evaluate initial population -----------------------------------------------------------------------------
+            for i in range(ea.total_pop_size):
                 nn.get_nn_weights(ea.pops[i])
-                reward = try_network(nn, wld, ag, wallDict)
-                ea.offspring_fitness[i] = reward
-            if gen < p.generations-1:  # Do not do down-select at the end of the final generation
-                ea.down_select()
-            if gen == p.generations-1:
-                ea.combine_pops()
-            best_fit[gen+1] = max(ea.fitness)  # Record best fitness after each gen
-            # print('Best Reward: ', max(ea.fitness))
+                reward = 0
+                for tw in range(p.n_train_worlds):
+                    reward += try_network(nn, training_set[tw], agent_instances[tw], wall_dicts[tw])
+                ea.fitness[i] = reward
 
-        # Test best NN ------------------------------------------------------------------------------------------
-        best_nn = np.argmax(ea.fitness)
-        nn.get_nn_weights(ea.pops[best_nn])
-        reward, robot_path = test_best_network(nn, wld, ag, wallDict)
-        # print("The final reward is: ", reward)
+            best_fit[0] = max(ea.fitness)  # Records best initial fitness
+            ea.epsilon_greedy_select()
+            ea.offspring_pop = ea.parent_pop.copy()  # Produce K offspring
+            ea.mutate()  # Mutate offspring population
 
-        # Create data files ------------------------------------------------------------------------------------
-        create_output_files("BestFit.csv", best_fit)  # Records best fitness for each gen for learning curve
-        create_output_files("RobotPath.csv", robot_path)  # Records path taken by best neural network
-        record_best_nn = [0.0 for _ in range(ea.policy_size)]
-        for w in range(ea.policy_size):  # Need to convert to non np-array for csv writer
-            record_best_nn[w] = ea.pops[best_nn, w]
-        create_output_files("BestNN.csv", record_best_nn)  # Records best neural network found
+            # Train population ------------------------------------------------------------------------------------
+            for gen in range(p.generations):
+                print("Generation: ", gen)
+                for i in range(p.offspring_pop_size):
+                    nn.get_nn_weights(ea.pops[i])
+                    reward = 0
+                    for tw in range(p.n_train_worlds):
+                        reward += try_network(nn, training_set[tw], agent_instances[tw], wall_dicts[tw])
+                    ea.offspring_fitness[i] = reward
+                if gen < p.generations-1:  # Do not do down-select at the end of the final generation
+                    ea.down_select()
+                if gen == p.generations-1:
+                    ea.combine_pops()
+                best_fit[gen+1] = max(ea.fitness)  # Record best fitness after each gen
+                # print('Best Reward: ', max(ea.fitness))
+
+            # Test best NN ------------------------------------------------------------------------------------------
+            ag_test.reset_agent_to_start()
+            best_nn = np.argmax(ea.fitness)
+            nn.get_nn_weights(ea.pops[best_nn])
+            reward, robot_path = test_best_network(nn, wld_test, ag_test, wallDictTest)
+            # print("The final reward is: ", reward)
+
+            # Create data files ------------------------------------------------------------------------------------
+            create_output_files("BestFit.csv", best_fit)  # Records best fitness for each gen for learning curve
+            create_output_files("RobotPath.csv", robot_path)  # Records path taken by best neural network
+            record_best_nn = [0.0 for _ in range(ea.policy_size)]
+            for w in range(ea.policy_size):  # Need to convert to non np-array for csv writer
+                record_best_nn[w] = ea.pops[best_nn, w]
+            create_output_files("BestNN.csv", record_best_nn)  # Records best neural network found
+
+    create_plots(0, wld_test.walls)  # (stat-run, walls)
 
 
 main()

@@ -172,7 +172,6 @@ class Agent:
                     collision = True
                 elif self.agent_pos[0] >= walls[1, 1, 0] + dist and x_new <= walls[1, 1, 0] + dist:
                     collision = True
-
         elif walls[0, 1, 1] == walls[1, 1, 1]:  # Checks teleporting when Agent must cross door in Y-Direction
             if self.agent_pos[0] <= threshold[0, 0] or self.agent_pos[0] >= threshold[1, 0]:  # Agent not in front of door
                 if self.agent_pos[1] >= walls[0, 1, 1] + dist and y_new <= walls[0, 1, 1] + dist:

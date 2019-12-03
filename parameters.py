@@ -7,6 +7,8 @@ class Parameters:
     generations = 10  # Number of generations for training NN
     time_step = 0.5  # Amount of time (seconds) agent moves each step
     agent_steps = 100  # Number of steps agent is allowed to move
+    n_train_worlds = 4
+    run_graph_only = False  # Setting to true only runs the graphing function
 
     # Agent Parameters
     # Turtlebot3 Burger
@@ -22,7 +24,7 @@ class Parameters:
     x_dim = 10.0
     y_dim = 10.0
     coll_penalty = -10.0
-    stp_penalty = 0.0
+    stp_penalty = -1.0
     gl_reward = 100.0
     n_walls = 2  # Number of internal walls in the world (DO NOT CHANGE)
     d_length = 2.0  # Length of the door in the world
@@ -31,8 +33,8 @@ class Parameters:
     epsilon = 0.1  # For e-greedy selection
     prob_mutation = 0.1  # The probability that a given weight will mutate
     mutation_rate = 0.05  # The maximum rate of change allowed from the mutation
-    offspring_pop_size = 20
-    parent_pop_size = 20
+    offspring_pop_size = 15
+    parent_pop_size = 15
 
     # Neural Network Parameters
     num_inputs = 48  # Number of input nodes in the input layer

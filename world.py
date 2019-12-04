@@ -29,7 +29,7 @@ class World:
 
         # Bottom Corner (Corner protruding into world)
         self.walls[0, 1, 0] = (self.world_x / 2.0)
-        self.walls[0, 1, 1] = (self.world_y / 2.0) + (self.door_length / 2.0)
+        self.walls[0, 1, 1] = (self.world_y / 2.0) + (self.door_length/2.0)
 
         # Wall 2 (Bottom of the world)
         # Bottom Corner (Intersects Outer Wall)
@@ -38,7 +38,7 @@ class World:
 
         # Top Corner (Corner protruding into world)
         self.walls[1, 1, 0] = (self.world_x / 2.0)
-        self.walls[1, 1, 1] = (self.world_y / 2.0) - (self.door_length / 2.0)
+        self.walls[1, 1, 1] = (self.world_y / 2.0) - (self.door_length/2.0)
 
         # Define threshold for doors
         # Threshold - Corner 1
@@ -61,7 +61,7 @@ class World:
         self.walls[0, 0, 1] = (self.world_y / 2.0)
 
         # middle Corner (Corner protruding into world)
-        self.walls[0, 1, 0] = (self.world_x / 2.0) - (self.door_length / 2.0)
+        self.walls[0, 1, 0] = (self.world_x / 2.0) - (self.door_length/2.0)
         self.walls[0, 1, 1] = (self.world_y / 2.0)
 
         # Wall 2 (middle of the world)
@@ -70,16 +70,16 @@ class World:
         self.walls[1, 0, 1] = (self.world_y / 2.0)
 
         # middle corner (corner protuding into world)
-        self.walls[1, 1, 0] = (self.world_x / 2.0) + (self.door_length / 2.0)
+        self.walls[1, 1, 0] = (self.world_x / 2.0) + (self.door_length/2.0)
         self.walls[1, 1, 1] = (self.world_y / 2.0)
 
         # Define threshold for doors
         # Threshold - Corner 1
-        self.threshold[0, 0] = (self.world_x / 2.0) - (self.door_length / 2.0)
+        self.threshold[0, 0] = (self.world_x / 2.0) - (self.door_length/2.0)
         self.threshold[0, 1] = (self.world_y / 2.0)
 
         # Threshold - Corner 2
-        self.threshold[1, 0] = (self.world_x / 2.0) + (self.door_length / 2.0)
+        self.threshold[1, 0] = (self.world_x / 2.0) + (self.door_length/2.0)
         self.threshold[1, 1] = (self.world_y / 2.0)
 
     def set_agent_starting_room(self, agent_pos):
@@ -100,7 +100,6 @@ class World:
         Calculates reward received by agent at each time step
         :return:
         """
-        reward = 0
         goal = False
 
         if collision:
@@ -111,20 +110,25 @@ class World:
                 if agent_pos[0] + agent_rad > self.threshold[0, 0] and agent_pos[0] - agent_rad > self.threshold[0, 0]:
                     if self.threshold[0, 1] < agent_pos[1] < self.threshold[1, 1]:
                         goal = True
-            else:  # Crosses in Y-Direction
+            elif self.threshold[0, 1] == self.threshold[1, 1]:  # Crosses in Y-Direction
                 if agent_pos[1] + agent_rad > self.threshold[0, 1] and agent_pos[1] - agent_rad > self.threshold[0, 1]:
                     if self.threshold[0, 0] < agent_pos[0] < self.threshold[1, 0]:
                         goal = True
-
+            else:
+                print("Threshold Error!")
         elif self.agent_starting_room == 2:  # Agent starts in room 2 and crosses to room 1
             if self.threshold[0, 0] == self.threshold[1, 0]:  # Crosses in X-Direction
                 if agent_pos[0] + agent_rad < self.threshold[0, 0] and agent_pos[0] - agent_rad < self.threshold[0, 0]:
                     if self.threshold[0, 1] < agent_pos[1] < self.threshold[1, 1]:
                         goal = True
-            else:  # Crosses in Y-Direction
+            elif self.threshold[0, 1] == self.threshold[1, 1]:  # Crosses in Y-Direction
                 if agent_pos[1] + agent_rad < self.threshold[0, 1] and agent_pos[1] - agent_rad < self.threshold[0, 1]:
                     if self.threshold[0, 0] < agent_pos[0] < self.threshold[1, 0]:
                         goal = True
+            else:
+                print("Threshold Error!")
+        else:
+            print("Starting Room Error!")
 
         if goal:
             return self.goal_reward, goal

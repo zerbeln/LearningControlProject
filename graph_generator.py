@@ -78,7 +78,7 @@ def create_robot_path_plot(srun, walls):
     plt.xlabel('X - Coordinates')
     plt.ylabel('Y - Coordinates')
     plt.savefig('RobotPath.png')
-    plt.show()
+    # plt.show()
 
 
 def create_plots(srun, walls):

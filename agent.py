@@ -46,7 +46,7 @@ class Agent:
         # Current agent position
         agent_x = self.agent_pos[0]
         agent_y = self.agent_pos[1]
-        agent_theta = self.agent_pos[2]
+        agent_theta = self.agent_pos[2]  # This is in radians
         
         # Conduct scan
         x_new = 0; y_new = 0
@@ -137,9 +137,9 @@ class Agent:
         y_new = self.agent_pos[1] + d_vel * time_step * sin(self.agent_pos[2])
         theta_new = self.agent_pos[2] + omega * time_step
         if theta_new < 0:
-            theta_new += 2*np.pi
-        if theta_new > 2*np.pi:
-            theta_new -= 2*np.pi
+            theta_new += 2 * np.pi
+        if theta_new > 2 * np.pi:
+            theta_new -= 2 * np.pi
 
         # Boundary checking -- if the new positions are illegal, reject and set collision = true
         # Keep the previous coordinates

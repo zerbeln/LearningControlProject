@@ -82,6 +82,70 @@ class World:
         self.threshold[1, 0] = (self.world_x / 2.0) + (self.door_length/2.0)
         self.threshold[1, 1] = (self.world_y / 2.0)
 
+    def world_config3(self):
+        """
+        Similar configuration to world 1 but with different door position
+        :return:
+        """
+        # Wall 1 (Top of the world)
+        # Top Corner
+        self.walls[0, 0, 0] = (self.world_x/2.0)
+        self.walls[0, 0, 1] = self.world_y
+
+        # Bottom Corner (Corner protruding into world)
+        self.walls[0, 1, 0] = (self.world_x / 2.0)
+        self.walls[0, 1, 1] = (self.world_y / 2.0) - 2
+
+        # Wall 2 (Bottom of the world)
+        # Bottom Corner (Intersects Outer Wall)
+        self.walls[1, 0, 0] = (self.world_x/2.0)
+        self.walls[1, 0, 1] = 0.0
+
+        # Top Corner (Corner protruding into world)
+        self.walls[1, 1, 0] = (self.world_x / 2.0)
+        self.walls[1, 1, 1] = (self.world_y / 2.0) - 3 
+
+        # Define threshold for doors
+        # Threshold - Corner 1
+        self.threshold[0, 0] = (self.world_x/2)
+        self.threshold[0, 1] = (self.world_y/2) - 2
+
+        # Threshold - Corner 2
+        self.threshold[1, 0] = (self.world_x/2)
+        self.threshold[1, 1] = (self.world_y/2) - 3
+
+    def world_config4(self):
+        """
+        Similar configuration to world 2 but with different door position
+        :return:
+        """
+        # Wall 1 (middle of the world)
+        # left corner
+        self.walls[0, 0, 0] = 0.0
+        self.walls[0, 0, 1] = (self.world_y / 2.0)
+
+        # middle Corner (Corner protruding into world)
+        self.walls[0, 1, 0] = (self.world_x / 2.0) - 3
+        self.walls[0, 1, 1] = (self.world_y / 2.0)
+
+        # Wall 2 (middle of the world)
+        # right corner
+        self.walls[1, 0, 0] = self.world_x
+        self.walls[1, 0, 1] = (self.world_y / 2.0)
+
+        # middle corner (corner protuding into world)
+        self.walls[1, 1, 0] = (self.world_x / 2.0) - 2
+        self.walls[1, 1, 1] = (self.world_y / 2.0)
+
+        # Define threshold for doors
+        # Threshold - Corner 1
+        self.threshold[0, 0] = (self.world_x / 2.0) - 3
+        self.threshold[0, 1] = (self.world_y / 2.0)
+
+        # Threshold - Corner 2
+        self.threshold[1, 0] = (self.world_x / 2.0) - 2
+        self.threshold[1, 1] = (self.world_y / 2.0)
+
     def set_agent_starting_room(self, agent_pos):
         if self.threshold[0, 0] == self.threshold[1, 0]:  # If x values are the same
             if agent_pos[0] < self.threshold[0, 0]:

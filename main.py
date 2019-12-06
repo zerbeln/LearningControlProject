@@ -101,34 +101,77 @@ def main():
     ea = ev_alg.EvoAlg(p)
 
     # Create instances of agents and worlds
-    wld1a = World(p); wld1b = World(p)
-    wld2a = World(p); wld2b = World(p)
+    wld1a = World(p); wld1a.world_config1()
+    wld1b = World(p); wld1b.world_config1()
+
+    wld2a = World(p); wld2a.world_config2()
+    wld2b = World(p); wld2b.world_config2()
+
+    wld3a = World(p); wld3a.world_config3()
+    wld3b = World(p); wld3b.world_config3()
+
+    wld4a = World(p); wld4a.world_config4()
+    wld4b = World(p); wld4b.world_config4()
 
     # Initialize instances of agents in training worlds (Parameters, X, Y, Theta)
     agent_instances = []
+    # Agent instances in World 1
     theta_1a = 261.0 * np.pi/180.0
-    ag1 = Agent(p, 3.2, 5.0, theta_1a)  # wld1a
-    agent_instances.append(ag1)
+    ag1a = Agent(p, 3.2, 5.0, theta_1a)  # wld1a
+    agent_instances.append(ag1a)
     theta_1b = 43.0 * np.pi/180.0
-    ag2 = Agent(p, 6.3, 6.2, theta_1b)  # wld1b
-    agent_instances.append(ag2)
+    ag1b = Agent(p, 6.3, 6.2, theta_1b)  # wld1b
+    agent_instances.append(ag1b)
+
+    # Agent instances in World 2
     theta_2a = 300.0 * np.pi/180.0
-    ag3 = Agent(p, 4.1, 2.5, theta_2a)  # wld2a
-    agent_instances.append(ag3)
+    ag2a = Agent(p, 4.1, 2.5, theta_2a)  # wld2a
+    agent_instances.append(ag2a)
     theta_2b = 145.0 * np.pi/180.0
-    ag4 = Agent(p, 6.9, 6.5, theta_2b)  # wld2b
-    agent_instances.append(ag4)
+    ag2b = Agent(p, 6.9, 6.5, theta_2b)  # wld2b
+    agent_instances.append(ag2b)
+
+    # Agent instances World 3
+    theta_3a = 182.8 * np.pi / 180.0
+    ag3a = Agent(p, 4.1, 2.2, theta_3a)
+    agent_instances.append(ag3a)
+    theta_3b = 323.3 * np.pi / 180.0
+    ag3b = Agent(p, 6.1, 3.8, theta_3b)
+    agent_instances.append(ag3b)
+
+    # Agent instances World 4
+    theta_4a = 21.0 * np.pi/180.0
+    ag4a = Agent(p, 2.0, 3.5, theta_4a)
+    agent_instances.append(ag4a)
+    theta_4b = 102.2 * np.pi*180.0
+    ag4b = Agent(p, 3.6, 5.9, theta_4b)
+    agent_instances.append(ag4b)
 
     # Initialize instances of worlds for training set
     training_set = []
-    wld1a.world_config1(); wld1a.set_agent_starting_room(ag1.agent_pos)
+    # World Configuration 1
+    wld1a.set_agent_starting_room(ag1a.agent_pos)
+    wld1b.set_agent_starting_room(ag1b.agent_pos)
     training_set.append(wld1a)
-    wld1b.world_config1(); wld1b.set_agent_starting_room(ag2.agent_pos)
     training_set.append(wld1b)
-    wld2a.world_config2(); wld2a.set_agent_starting_room(ag3.agent_pos)
+
+    # World Configuration 2
+    wld2a.set_agent_starting_room(ag2a.agent_pos)
+    wld2b.set_agent_starting_room(ag2b.agent_pos)
     training_set.append(wld2a)
-    wld2b.world_config2(); wld2b.set_agent_starting_room(ag4.agent_pos)
     training_set.append(wld2b)
+
+    # World Configuration 3
+    wld3a.set_agent_starting_room(ag3a.agent_pos)
+    wld3b.set_agent_starting_room(ag3b.agent_pos)
+    training_set.append(wld3a)
+    training_set.append(wld3b)
+
+    # World Configuration 4
+    wld4a.set_agent_starting_room(ag4a.agent_pos)
+    wld4b.set_agent_starting_room(ag4b.agent_pos)
+    training_set.append(wld4a)
+    training_set.append(wld4b)
 
     # Build dictionaries for LIDAR scans
     wall_dicts = []
@@ -138,12 +181,18 @@ def main():
     wallDict2 = build_wall_dict(wld2a)
     wall_dicts.append(wallDict2)
     wall_dicts.append(wallDict2)
+    wallDict3 = build_wall_dict(wld3a)
+    wall_dicts.append(wallDict3)
+    wall_dicts.append(wallDict3)
+    wallDict4 = build_wall_dict(wld4a)
+    wall_dicts.append(wallDict4)
+    wall_dicts.append(wallDict4)
 
     # Create test instances (not training set)
-    theta_test = 91.0 * np.pi/180.0
-    ag_test = Agent(p, 3.7, 5.3, theta_test)
+    theta_test = 271.0 * np.pi/180.0
+    ag_test = Agent(p, 5.7, 3.3, theta_test)
     wld_test = World(p)
-    wld_test.world_config1()
+    wld_test.world_config2()
     wld_test.set_agent_starting_room(ag_test.agent_pos)
     wallDictTest = build_wall_dict(wld_test)
 

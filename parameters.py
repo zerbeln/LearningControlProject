@@ -4,10 +4,10 @@ class Parameters:
 
     # Test Parameters
     stat_runs = 1  # Number of statistical runs to perform
-    generations = 0  # Number of generations for training NN
+    generations = 1000  # Number of generations for training NN
     time_step = 0.5  # Amount of time (seconds) agent moves each step
-    agent_steps = 100  # Number of steps agent is allowed to move
-    n_train_worlds = 4
+    agent_steps = 50  # Number of steps agent is allowed to move
+    n_train_worlds = 8
     run_graph_only = False  # Setting to true only runs the graphing function
 
     # Agent Parameters

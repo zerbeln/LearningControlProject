@@ -89,7 +89,7 @@ class World:
         """
         # Wall 1 (Top of the world)
         # Top Corner
-        self.walls[0, 0, 0] = (self.world_x/2.0)
+        self.walls[0, 0, 0] = (self.world_x / 2.0)
         self.walls[0, 0, 1] = self.world_y
 
         # Bottom Corner (Corner protruding into world)
@@ -98,21 +98,21 @@ class World:
 
         # Wall 2 (Bottom of the world)
         # Bottom Corner (Intersects Outer Wall)
-        self.walls[1, 0, 0] = (self.world_x/2.0)
+        self.walls[1, 0, 0] = (self.world_x / 2.0)
         self.walls[1, 0, 1] = 0.0
 
         # Top Corner (Corner protruding into world)
         self.walls[1, 1, 0] = (self.world_x / 2.0)
-        self.walls[1, 1, 1] = (self.world_y / 2.0) - 3 
+        self.walls[1, 1, 1] = (self.world_y / 2.0) - 3
 
         # Define threshold for doors
         # Threshold - Corner 1
-        self.threshold[0, 0] = (self.world_x/2)
-        self.threshold[0, 1] = (self.world_y/2) - 2
+        self.threshold[0, 0] = (self.world_x / 2)
+        self.threshold[0, 1] = (self.world_y / 2) - 2
 
         # Threshold - Corner 2
-        self.threshold[1, 0] = (self.world_x/2)
-        self.threshold[1, 1] = (self.world_y/2) - 3
+        self.threshold[1, 0] = (self.world_x / 2)
+        self.threshold[1, 1] = (self.world_y / 2) - 3
 
     def world_config4(self):
         """
